@@ -1,0 +1,34 @@
+body.white {
+  background-color: white;
+  color: black;
+}
+body.black {
+  background-color: black;
+  color: white;
+}
+
+#logo {
+  width: 100px;
+}
+
+.container {
+  padding-top: 20px;
+}
+
+#control {
+  margin-bottom: 40px;
+}
+
+.container01 {
+  margin: 0 auto;
+}
+
+.sticky-column {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+}
+
+body {
+  font-family: "Noto Sans KR", sans-serif;
+}

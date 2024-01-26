@@ -1,0 +1,55 @@
+@font-face {
+    font-family: 'DOSGothic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_eight@1.0/DOSGothic.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+body.white {
+  background-color: white;
+  color: black;
+}
+body.black {
+  background-color: black;
+  color: white;
+}
+
+#logo {
+  width: 100px;
+}
+
+.container {
+  padding-top: 20px;
+}
+
+#control {
+  margin-bottom: 40px;
+}
+
+.container01 {
+  margin: 0 auto;
+}
+
+
+
+
+
+
+
+
+.table>thead{
+  font-size: 19px;
+}
+
+
+.container_t{
+  background-color: #000;
+  font-family: 'DOSGothic';
+}
+
+
+.custom-border{
+  border-color: #333 !important;
+}
+

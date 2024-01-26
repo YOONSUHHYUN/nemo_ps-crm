@@ -1,0 +1,129 @@
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <link rel="stylesheet" type="text/css" href="style.css">
+
+  <!--<link href="bootstrap-3.3.4-dist/css/bootstrap.min.css" rel="stylesheet">-->
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+
+
+<title>기가입업체 계산기</title>
+  </head>
+
+    <body class="bg-light">
+
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="index_backup.html">HOME</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDarkDropdown" aria-controls="navbarNavDarkDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+          <ul class="navbar-nav">
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                네모상품계산기
+              </a>
+              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
+                <li><a class="dropdown-item" href="new_customer.html">미가입 업체</a></li>
+                <li><a class="dropdown-item" href="add_customer.html">기가입 업체</a></li>
+              </ul>
+            </li>
+             <a class="nav-link active" aria-current="page" href="repayment.html">당월 재결제업체</a>
+             <a class="nav-link active" aria-current="page" href="refund.html">환불 계산기</a>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+
+
+
+    <div class="p-5 mb-4 bg-light rounded-3">
+      <header class="jumbotron text-center">
+          <img
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAAAXNSR0IArs4c6QAAAwxJREFUaAXtmkGLEzEUx9+LSwUVL34AD3paq8IKsn4AP4DYsoKCF6+CH6GfQPAseJO1FPXkV1ARdmV1j+vBmwreRGFl5/lepjNuy7R5O0lnkzI5tJ3pS/L/5SWTZPIQlImu9B4AwUM2XyWCFWW2hZshYMaV/ACELQDahNvdTRwM5J5NWPyY9U2DgYGXu88Y6v4sm5juM/AOdKCH26M90TUXMDW4oqEZ6id0cF0gZwKmCvcfkj3Zu7RWCZg6XAmJcO9EcVF8Lwuc8CDiyQnAZYKzgIBnyy66bHBjwMwCLiOcAErKJ2zlPMdzzC/u2M95cnkHlP3Oi2jqE0/zqFoHorsEdEZbK8oKhTJ46srAA/YzdMwt3Bp+cdku8n9a61+Ev/CKiC5r6jHj5ddcW+u5COBEpF2hiBbpTYpk2GbVacfd8rg9d1ij1SJDRZGMauEsYy62pNQkHnSnxh8obknah5wOUFFfrCYtYKye0eoKvjOnq/3rkNF5rYAJO4NfcWf0YeKe50VQQOr2X9ABbdTWdMBrlG5/iLujO7XLmMoYbAyK51hefbixMCnD9oIpoXUvgwHW7pZVyut28YqywgFWFB7DrRYwBi/4aGg96NN6MeRtPRiDF3w0tB70ab0Y8rYejMELPhpaD/q0Xgx5w3mQN6vBgAKWFQxQduL8MnboCyllhNzVB93Ry06cN6uPa+8NY39lId4bt37Q9yo+vSJYF/URsci8LeAiW7eJsnUeRHOqCTFHq0MORN1JB0hww11U0xZ82qtISkA+Nr62cUFRXiMm9pSXj7JdlfGp9B8VoD0T389exwBZHmFrzumJPmLW7ZGrJYr/7bHxcQUhyHNAhooyCIHDRwjMys0jARagKXyjwUf4afTEsFfK2MoUhGs0FnBiy2OQvmsypWJzGC4HRNxORbxL5zRcDihhwEuQquByQIlxljDghNMsOEHKg/EkPGqf3vN8cS41znlwwmIn+jw8imOcE/KkzHMuuBJQflhIiXHmMGBe4rxh2G8xTiGy/GK4t3YS53lOtM9L/wDf6g02UV0g9QAAAABJRU5ErkJggg=="
+          alt="네모" class="img-circle" id="logo">
+          <h1><a href="new_customer.html" target='_blank'>네모 기가입업체 계산기</a></h1>
+          <h4>-BUILD BY YSH-</h4>
+
+
+</br>
+
+<center><h3><?php echo $_GET['cname']; ?>/<?php echo $_GET['name']; ?></h3></center>
+
+</br></br></br></br>
+
+
+            <form method="get" class="jumbotron text-center" action="add_nomalcal.php">
+<center><h3>일반상품</h3></center>
+
+                매물건수 : <input type="text" name="number" />
+                기준날짜 : <input type="date" name="startingdate" />
+                <input type = hidden value = <?php echo $_GET['cname'];?> name = 'cname'/>
+                <input type = hidden value = <?php echo $_GET['name'];?> name = 'name'>
+                <input type="submit" />
+              </form>
+
+</br></br></br></br>
+
+<form method="get" class="jumbotron text-center" action="new_premiumcal.php">
+<center><h3>프리미엄상품</h3></center>
+지역(시) :
+  <select name='address1'>
+  <option value="서울특별시">서울특별시</option>
+  <option value="경기도">경기도</option>
+  <option value="강원도">강원도</option>
+  <option value="제주특별자치도">제주특별자치도</option>
+  <option value="충청북도">충청북도</option>
+  <option value="경상남도">경상남도</option>
+  <option value="울산광역시">울산광역시</option>
+  <option value="전라남도">전라남도</option>
+  <option value="경상북도">경상북도</option>
+  <option value="충청남도">충청남도</option>
+  <option value="대전광역시">대전광역시</option>
+  <option value="대구광역시">대구광역시</option>
+  <option value="광주광역시">광주광역시</option>
+  <option value="전라북도">전라북도</option>
+  <option value="부산광역시">부산광역시</option>
+  <option value="세종특별자치시">세종특별자치시</option>
+  <option value="인천광역시">인천광역시</option>
+  </select>
+
+    프리미엄  : <input type="text" name="address" />
+    상가/사무실 :
+      <select name='option'>
+      <option value="상가">상가</option>
+      <option value="사무실">사무실</option>
+      <option value="상가사무실">상가+사무실</option>
+      </select>
+    기준날짜 : <input type="date" name="startingdate" />
+    <input type = hidden value = <?php echo $_GET['cname'];?> name = 'cname'/>
+    <input type = hidden value = <?php echo $_GET['name'];?> name = 'name'>
+    <input type="submit" />
+  </form>
+
+</br></br></br></br>
+
+  <center><input type="button" value="이전페이지" onClick="history.go(-1)"></center>
+</br>  <center><input type="button" value="HOME" onClick="location.href='index_backup.html'"></center>
+
+
+      </header>
+  <div class="row">
+
+
+
+
+  </body>
+</html>

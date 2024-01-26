@@ -1,0 +1,95 @@
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <link rel="stylesheet" type="text/css" href="style.css">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+
+
+  <!--<link href="bootstrap-3.3.4-dist/css/bootstrap.min.css" rel="stylesheet">-->
+<title>네모 금액조회</title>
+
+  </head>
+
+
+
+
+
+
+    <div class="p-5 mb-4 bg-light rounded-3">
+      <header class="jumbotron text-center">
+          <img
+        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAAAXNSR0IArs4c6QAAAwxJREFUaAXtmkGLEzEUx9+LSwUVL34AD3paq8IKsn4AP4DYsoKCF6+CH6GfQPAseJO1FPXkV1ARdmV1j+vBmwreRGFl5/lepjNuy7R5O0lnkzI5tJ3pS/L/5SWTZPIQlImu9B4AwUM2XyWCFWW2hZshYMaV/ACELQDahNvdTRwM5J5NWPyY9U2DgYGXu88Y6v4sm5juM/AOdKCH26M90TUXMDW4oqEZ6id0cF0gZwKmCvcfkj3Zu7RWCZg6XAmJcO9EcVF8Lwuc8CDiyQnAZYKzgIBnyy66bHBjwMwCLiOcAErKJ2zlPMdzzC/u2M95cnkHlP3Oi2jqE0/zqFoHorsEdEZbK8oKhTJ46srAA/YzdMwt3Bp+cdku8n9a61+Ev/CKiC5r6jHj5ddcW+u5COBEpF2hiBbpTYpk2GbVacfd8rg9d1ij1SJDRZGMauEsYy62pNQkHnSnxh8obknah5wOUFFfrCYtYKye0eoKvjOnq/3rkNF5rYAJO4NfcWf0YeKe50VQQOr2X9ABbdTWdMBrlG5/iLujO7XLmMoYbAyK51hefbixMCnD9oIpoXUvgwHW7pZVyut28YqywgFWFB7DrRYwBi/4aGg96NN6MeRtPRiDF3w0tB70ab0Y8rYejMELPhpaD/q0Xgx5w3mQN6vBgAKWFQxQduL8MnboCyllhNzVB93Ry06cN6uPa+8NY39lId4bt37Q9yo+vSJYF/URsci8LeAiW7eJsnUeRHOqCTFHq0MORN1JB0hww11U0xZ82qtISkA+Nr62cUFRXiMm9pSXj7JdlfGp9B8VoD0T389exwBZHmFrzumJPmLW7ZGrJYr/7bHxcQUhyHNAhooyCIHDRwjMys0jARagKXyjwUf4afTEsFfK2MoUhGs0FnBiy2OQvmsypWJzGC4HRNxORbxL5zRcDihhwEuQquByQIlxljDghNMsOEHKg/EkPGqf3vN8cS41znlwwmIn+jw8imOcE/KkzHMuuBJQflhIiXHmMGBe4rxh2G8xTiGy/GK4t3YS53lOtM9L/wDf6g02UV0g9QAAAABJRU5ErkJggg=="
+          alt="네모" class="img-circle" id="logo">
+          <h1>네모 상품(중개사무소) 금액조회</h1>
+
+
+</br></br>
+
+</br></br></br></br>
+
+<form method="get" class="jumbotron text-center" action="nemo_price_new_hyoju.php">
+<center><h3>신규 지역별 가격조회(당일)</h3></center>
+
+지역(시) :
+  <select name='address1'>
+  <option value="서울특별시">서울특별시</option>
+  <option value="경기도">경기도</option>
+  <option value="강원도">강원도</option>
+  <option value="제주특별자치도">제주특별자치도</option>
+  <option value="충청북도">충청북도</option>
+  <option value="경상남도">경상남도</option>
+  <option value="울산광역시">울산광역시</option>
+  <option value="전라남도">전라남도</option>
+  <option value="경상북도">경상북도</option>
+  <option value="충청남도">충청남도</option>
+  <option value="대전광역시">대전광역시</option>
+  <option value="대구광역시">대구광역시</option>
+  <option value="광주광역시">광주광역시</option>
+  <option value="전라북도">전라북도</option>
+  <option value="부산광역시">부산광역시</option>
+  <option value="세종특별자치시">세종특별자치시</option>
+  <option value="인천광역시">인천광역시</option>
+  </select>
+
+
+    지역(구)  : <input type="text" name="address" />
+
+    <input type="submit" />
+  </form>
+  <p style="font-size:12px;"><h8>입력 예시) (마포구/강남구/용인시기흥구->용인시,안산시단원구->안산시)</h8></p></br>
+</br>
+  ※모든상품의 종료일은 월말로 책정되며</br>
+  조회하신 일자를 기준으로 금액이 표시됩니다.</br></br>
+  시작일을 다르게 원하시거나</br>
+  프리미엄상품 입점가능여부 및 기타 진행중인 <font color=blue>프로모션</font>은</br>
+  아래 <font color=red>문의하기</font>를 통해 영업담당자에게 상담 부탁드립니다.
+</br></br></br></br>
+
+
+
+
+
+
+</br>
+
+<a href="sms:01055364776" target="_blank"><img
+src="button_01.png"
+alt="문의하기" ></a>
+
+
+
+
+      </header>
+
+
+
+  </body>
+</html>
