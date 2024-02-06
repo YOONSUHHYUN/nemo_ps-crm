@@ -8,24 +8,17 @@ error_reporting(E_ALL);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require_once 'config/config.php';
-
-    // 데이터베이스 연결
     $conn = new mysqli($config['host'], $config['duser'], $config['dpw'], $config['dname']);
-
-    // 데이터베이스 연결 오류 처리
     if ($conn->connect_error) {
         die("데이터베이스 연결 실패: " . $conn->connect_error);
     }
 
     if (isset($_POST['selected_agent']) || isset($_POST['selected_status'])) {
-        // 선택한 담당자와 현상태
         $selectedAgent = $_POST['selected_agent'];
         $selectedStatus = isset($_POST['selected_status']) ? $_POST['selected_status'] : '';
         $selectedAddress1 = isset($_POST['selected_address1']) ? $_POST['selected_address1'] : '';
         $selectedAddress2 = isset($_POST['selected_address2']) ? $_POST['selected_address2'] : '';
         $selectedDate = isset($_POST['selected_Date']) ? $_POST['selected_Date'] : '';
-
-        // SQL 쿼리 생성
         $sql222 = "
         
 
@@ -153,16 +146,11 @@ WHERE rn = 1 and (구분 = '무료' or 구분 is null) and 수신 = '문자' and
         }
 
         $sql222 .= " ORDER BY combined2.컨택일 DESC";
-
-        // SQL 쿼리 실행
         $result222 = $conn->query($sql222);
-
-        // Check for query execution success
         if (!$result222) {
-            die("쿼리 실행 실패: " . $conn->error); // Add error handling to show the query error message
+            die("쿼리 실행 실패: " . $conn->error); 
         }
 
-        // 쿼리 결과 처리
         if ($result222->num_rows > 0) {
             echo '<div class="table-responsive">';
             echo '<table class="table table-bordered table-striped">';
@@ -175,38 +163,70 @@ WHERE rn = 1 and (구분 = '무료' or 구분 is null) and 수신 = '문자' and
             echo '<th><button id="copyContactsButton">연락처 복사</button></th>';
             echo '<th>주소1</th>';
             echo '<th>주소2</th>';
-            //echo '<td><select name="address2" id="address2" class="form-control"></select></td>';
             echo '<th>구분(유/무료)</th>';
             echo '<th>메모</th>';
             echo '<th>문자동의</th>';
             echo '<th>담당자</th>';
             echo '<th>컨택일</th>';
-            // Add other column headers as needed
             echo '</tr>';
             echo '</thead>';
+
+            echo '<script>';
+            echo 'var modalId = "";'; 
+            echo '</script>';
+
             echo '<tbody>';
             while ($row221 = $result222->fetch_assoc()) {
                 echo '<tr>';
-                $href = $row221['고유키'] ? 'update_customer.php?num=' . urlencode($row221['고유키']) : 'update_target.php?num=' . urlencode($row221['num']);
-                $text = $row221['고유키'] ? '기가입' : $row221['num'];
-
-            echo '<td><a href="' . $href . '" class="num-link">' . $text . '</a></td>';
+                $modalId = 'modal' . ($row221['고유키'] ?: $row221['num']);
+            
+                echo '<td>';
+                echo '<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#' . $modalId . '">';
+                echo $row221['고유키'] ? '기가입' : $row221['num'];
+                echo '</button>';
+                echo '</td>';
             echo '<td>' . $row221['업체명'] . '</td>';
             echo '<td>' . $row221['대표자명'] . '</td>';
             echo '<td data-contact="' . $row221['연락처'] . '">' . $row221['연락처'] . '</td>';
             echo '<td>' . $row221['시도'] . '</td>';
             echo '<td>' . $row221['시군구'] . '</td>';
             echo '<td>' . $row221['구분'] . '</td>';
-
             echo '<td>' . (strlen($row221['메모']) > 30 ? substr($row221['메모'], 0, 40) . "..." : $row221['메모']) . '</td>';
             echo '<td>' . $row221['문자동의'] . '</td>';
             echo '<td>' . $row221['담당자'] . '</td>';
             echo '<td>' . $row221['컨택일'] . '</td>';
             echo '</tr>';
-            }
-            echo '</tbody>';
-            echo '</table>';
+            echo '<script>';
+            echo 'var modalId = "' . $modalId . '";';
+            echo 'var modal = document.createElement("div");';
+            echo 'modal.className = "modal fade";';
+            echo 'modal.id = modalId;';
+            echo 'modal.setAttribute("data-bs-keyboard", "false");';
+            echo 'modal.setAttribute("tabindex", "-1");';
+            echo 'modal.setAttribute("aria-labelledby", modalId + "Label");';
+            echo 'modal.setAttribute("aria-hidden", "true");';
+            echo 'modal.innerHTML = `';
+            echo '<div class="modal-dialog modal-xl">';
+            echo '<div class="modal-content" style="width:1500px;">';
+            echo '<div class="modal-header">';
+            echo '<h1 class="modal-title fs-5" id="${modalId}Label">Modal title</h1>';
+            echo '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
             echo '</div>';
+            echo '<div class="modal-body" style="height: 800px;" id="${modalId}Content">';
+            echo '<iframe src="' . ($row221['고유키'] ? 'update_customer.php?num=' . urlencode($row221['고유키']) : 'update_target.php?num=' . urlencode($row221['num'])) . '" class="num-link" frameborder="0" width="100%" height="750px"></iframe>';
+            echo '</div>';
+            echo '<div class="modal-footer">';
+            echo '<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>';
+            echo '</div>';
+            echo '</div>';
+            echo '</div>';
+            echo '</div>`;';
+            echo 'document.body.appendChild(modal);';
+            echo '</script>';
+        }
+        echo '</tbody>';
+        echo '</table>';
+        echo '</div>';
         } else {
             echo "결과가 없습니다.";
         }
@@ -277,7 +297,7 @@ WHERE rn = 1 and (구분 = '무료' or 구분 is null) and 수신 = '문자' and
     </script>
 
 
-    <!-- JavaScript 코드를 추가합니다. -->
+=
     <script>
         // 복사 버튼을 클릭할 때 실행될 함수를 정의합니다.
         document.getElementById('copyContactsButton').addEventListener('click', function() {

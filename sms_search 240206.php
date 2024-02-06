@@ -185,64 +185,37 @@ WHERE rn = 1 and (구분 = '무료' or 구분 is null) and 수신 = '문자' and
             echo '</tr>';
             echo '</thead>';
             echo '<tbody>';
-            $i = 0;
             while ($row221 = $result222->fetch_assoc()) {
                 echo '<tr>';
-                $modalId = 'staticBackdrop' . $i;
-                ?>
-                <?php
-                echo '<td>';
-echo '<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#' . $modalId . '">';
-echo $row221['고유키'] ? '기가입' : $row221['num'];
-echo '</button>';
+                $href = $row221['고유키'] ? 'update_customer.php?num=' . urlencode($row221['고유키']) : 'update_target.php?num=' . urlencode($row221['num']);
+                $text = $row221['고유키'] ? '기가입' : $row221['num'];
 
-// Modal
-echo '<div class="modal fade" id="' . $modalId . '" data-bs-keyboard="false" tabindex="-1" aria-labelledby="' . $modalId . 'Label" aria-hidden="true">';
-echo '<div class="modal-dialog modal-xl">';
-echo '<div class="modal-content" style="width:1500px;">';
-echo '<div class="modal-header">';
-echo '<h1 class="modal-title fs-5" id="' . $modalId . 'Label">Modal title</h1>';
-echo '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
-echo '</div>';
-echo '<div class="modal-body" style="height: 800px;" id="' . $modalId . 'Content">';
+            echo '<td><a href="' . $href . '" class="num-link">' . $text . '</a></td>';
+            echo '<td>' . $row221['업체명'] . '</td>';
+            echo '<td>' . $row221['대표자명'] . '</td>';
+            echo '<td data-contact="' . $row221['연락처'] . '">' . $row221['연락처'] . '</td>';
+            echo '<td>' . $row221['시도'] . '</td>';
+            echo '<td>' . $row221['시군구'] . '</td>';
+            echo '<td>' . $row221['구분'] . '</td>';
 
-echo '<iframe src="' . ($row221['고유키'] ? 'update_customer.php?num=' . urlencode($row221['고유키']) : 'update_target.php?num=' . urlencode($row221['num'])) . '" class="num-link" frameborder="0" width="100%" height="750px"></iframe>';
-echo '</div>';
-echo '<div class="modal-footer">';
-echo '<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>';
-echo '</div>';
-echo '</div>';
-echo '</div>';
-echo '</div>';
-
-echo '</td>'; ?>
-                <?php
-                echo '<td>' . $row221['업체명'] . '</td>';
-                echo '<td>' . $row221['대표자명'] . '</td>';
-                echo '<td data-contact="' . $row221['연락처'] . '">' . $row221['연락처'] . '</td>';
-                echo '<td>' . $row221['시도'] . '</td>';
-                echo '<td>' . $row221['시군구'] . '</td>';
-                echo '<td>' . $row221['구분'] . '</td>';
-                echo '<td>' . (strlen($row221['메모']) > 30 ? substr($row221['메모'], 0, 40) . "..." : $row221['메모']) . '</td>';
-                echo '<td>' . $row221['문자동의'] . '</td>';
-                echo '<td>' . $row221['담당자'] . '</td>';
-                echo '<td>' . $row221['컨택일'] . '</td>';
-                echo '</tr>';
-                $i++;
+            echo '<td>' . (strlen($row221['메모']) > 30 ? substr($row221['메모'], 0, 40) . "..." : $row221['메모']) . '</td>';
+            echo '<td>' . $row221['문자동의'] . '</td>';
+            echo '<td>' . $row221['담당자'] . '</td>';
+            echo '<td>' . $row221['컨택일'] . '</td>';
+            echo '</tr>';
             }
-        
             echo '</tbody>';
             echo '</table>';
             echo '</div>';
         } else {
             echo "결과가 없습니다.";
         }
-        
+
         $conn->close();
-        } else {
-            echo "선택한 담당자가 없습니다.";
-        }
+    } else {
+        echo "선택한 담당자가 없습니다.";
     }
+}
 ?>
  
 

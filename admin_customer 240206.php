@@ -1,6 +1,7 @@
 
 
 <?php
+$searchQuery = $_GET['search'];
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -22,59 +23,64 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $selectedStatus = isset($_POST['selected_status']) ? $_POST['selected_status'] : '';
         $selectedAddress1 = isset($_POST['selected_address1']) ? $_POST['selected_address1'] : '';
         $selectedAddress2 = isset($_POST['selected_address2']) ? $_POST['selected_address2'] : '';
-
+        $selectedDate = isset($_POST['selected_Date']) ? $_POST['selected_Date'] : '';
+        $selectedSearch2 = isset($_POST['selected_Search']) ? $_POST['selected_Search'] : '';
 
         // SQL 쿼리 생성
         $sql222 = "SELECT A.*, B.*
-        FROM (
-            SELECT 
-                `num`, `담당자`, `관심도`, `수신`, `회사소개`, `상품소개`, `결제여부`, `현상태`, `메모`, `문자동의`, `컨택일`
-            FROM (
-                SELECT 
-                    `num`, `담당자`, `관심도`, `수신`, `회사소개`, `상품소개`, `결제여부`, `현상태`, `메모`, `문자동의`, `컨택일`,
-                    ROW_NUMBER() OVER (PARTITION BY `num` ORDER BY `컨택일` DESC) AS rn
-                FROM `agent`
-                WHERE `수신` <> '문자' AND `수신` <> '실패' AND `담당자` = '$selectedAgent'
-                -- 여기에 필요한 추가 조건을 추가하세요
-                AND 1=1  -- '수신'이 '문자'가 아닌 행만 선택
-            ) AS subquery
-            WHERE rn = 1
-        ) AS A
-        LEFT JOIN `target` AS B ON A.`num` = B.`num` 
-        WHERE `문자동의` IN ('O') ";
+        FROM customer A
+        left join (
+            SELECT `업체아이디`, MAX(`edate`) AS max_edate
+            FROM plist
+            GROUP BY `업체아이디`
+        ) B 
+        ON A.고유키 = B.`업체아이디`
+        where 1=1 ";
+
+        //if (!empty($selectedAgent)) {
+        //    $selectedAgent = mysqli_real_escape_string($conn, $selectedAgent);
+         //   $sql222 .= " AND `관리담당자` = '$selectedAgent'";
+        //}
 
         if (!empty($selectedAgent)) {
             $selectedAgent = mysqli_real_escape_string($conn, $selectedAgent);
-            $sql222 .= " AND `담당자` = '$selectedAgent'";
-        }
-
-        #if (!empty($selectedStatus)) {
-        #    $selectedStatus = mysqli_real_escape_string($conn, $selectedStatus);
-        #    $sql222 .= " AND `현상태` = '$selectedStatus'";
-        #}
-
-        if (!empty($selectedStatus)) {
-            $selectedStatus = mysqli_real_escape_string($conn, $selectedStatus);
-            if ($selectedStatus == 1) {
-                $sql222 .= " AND `현상태` <> '결제성공'";
+        
+            $퇴사자List = array('퇴사자');
+            if (in_array($selectedAgent, $퇴사자List)) {
+                $sql222 .= " AND (`관리담당자` NOT IN ('윤서현', '이다영', '최효주', '이민성', '김윤석', '홍석환', '이수복') OR `관리담당자` IS NULL)";
             } else {
-                $sql222 .= " AND `현상태` = '$selectedStatus'";
+                $sql222 .= " AND `관리담당자` = '$selectedAgent'";
             }
         }
 
+        if (!empty($selectedStatus)) {
+            $selectedStatus = mysqli_real_escape_string($conn, $selectedStatus);
+            $sql222 .= " AND `구분` = '$selectedStatus'";
+        }
+
+        
  
 
         if (!empty($selectedAddress1)) {
             $selectedAddress1 = mysqli_real_escape_string($conn, $selectedAddress1);
-            $sql222 .= " AND `시도` = '$selectedAddress1'";
+            $sql222 .= " AND `시` = '$selectedAddress1'";
         }
         
         if (!empty($selectedAddress2)) {
             $selectedAddress2 = mysqli_real_escape_string($conn, $selectedAddress2);
-            $sql222 .= " AND `시군구` = '$selectedAddress2'";
+            $sql222 .= " AND `구` = '$selectedAddress2'";
         }
         
-        $sql222 .= " ORDER BY A.`컨택일` DESC";
+        if (!empty($selectedDate)) {
+            $selectedDate = mysqli_real_escape_string($conn, $selectedDate);
+            $sql222 .= " AND DATE_FORMAT(`컨택일`, '%Y-%m-%d') <= '$selectedDate'";
+        }
+
+        $sql222 .= "AND `테스트계정` <> '테스트' and `관리담당자` <> '샘플' 
+        AND (대표자명 LIKE '%" . mysqli_real_escape_string($conn, $selectedSearch2) . "%' OR
+        중개업소명 LIKE '%" . mysqli_real_escape_string($conn, $selectedSearch2) . "%' OR
+        휴대폰번호 LIKE '%" . mysqli_real_escape_string($conn, $selectedSearch2) . "%')
+        ORDER BY b.max_edate DESC ";
 
         // SQL 쿼리 실행
         $result222 = $conn->query($sql222);
@@ -90,57 +96,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo '<table class="table table-bordered table-striped">';
             echo '<thead>';
             echo '<tr>';
-            echo '<th>NUM</th>';
-            echo '<th>업체명</th>';
+            
+            echo '<th>고유키</th>';
+            echo '<th>중개업소명</th>';
             echo '<th>대표자명</th>';
             echo '<th><button id="copyContactsButton">연락처 복사</button></th>';
             echo '<th>주소1</th>';
-            //echo ' <td><select name="address1" id="address1" class="form-control">
-            //<option value="주소1">주소1</option>
-            //<option value="서울특별시">서울특별시</option>
-            //<option value="부산광역시">부산광역시</option>
-            //<option value="대구광역시">대구광역시</option>
-            //<option value="인천광역시">인천광역시</option>
-            //<option value="광주광역시">광주광역시</option>
-            //<option value="대전광역시">대전광역시</option>
-            //<option value="울산광역시">울산광역시</option>
-            //<option value="세종특별자치시">세종특별자치시</option>
-            //<option value="경기도">경기도</option>
-            //<option value="강원특별자치도">강원특별자치도</option>
-            //<option value="충청북도">충청북도</option>
-            //<option value="충청남도">충청남도</option>
-            //<option value="전라북도">전라북도</option>
-            //<option value="전라남도">전라남도</option>
-            //<option value="경상북도">경상북도</option>
-            //<option value="경상남도">경상남도</option>
-            //<option value="제주특별자치도">제주특별자치도</option>
-          //</select></td>';
             echo '<th>주소2</th>';
-            //echo '<td><select name="address2" id="address2" class="form-control"></select></td>';
-            echo '<th>관심도</th>';
-            echo '<th>현상태</th>';
-            echo '<th>메모</th>';
-            echo '<th>문자동의</th>';
-            echo '<th>담당자</th>';
-            echo '<th>컨택일</th>';
-            // Add other column headers as needed
+            echo '<th>구분</th>';
+            echo '<th>상품종료일</th>';
+            echo '<th>가입일</th>';
+            echo '<th>관리담당자</th>';
             echo '</tr>';
             echo '</thead>';
             echo '<tbody>';
             while ($row221 = $result222->fetch_assoc()) {
                 echo '<tr>';
-                echo '<td><a href="update_target.php?num=' . $row221['num'] . '" class="num-link">' . $row221['num'] . '</a></td>';
-                echo '<td>' . $row221['업체명'] . '</td>';
+                echo '<td><a href="update_customer.php?num=' . $row221['고유키'] . '" class="num-link">' . $row221['고유키'] . '</a></td>';
+                echo '<td>' . $row221['중개업소명'] . '</td>';
                 echo '<td>' . $row221['대표자명'] . '</td>';
-                echo '<td data-contact="' . $row221['연락처'] . '">' . $row221['연락처'] . '</td>';
-                echo '<td>' . $row221['시도'] . '</td>';
-                echo '<td>' . $row221['시군구'] . '</td>';
-                echo '<td>' . $row221['관심도'] . '</td>';
-                echo '<td>' . $row221['현상태'] . '</td>';
-                echo '<td>' . (strlen($row221['메모']) > 30 ? substr($row221['메모'], 0, 40) . "..." : $row221['메모']) . '</td>';
-                echo '<td>' . $row221['문자동의'] . '</td>';
-                echo '<td>' . $row221['담당자'] . '</td>';
-                echo '<td>' . $row221['컨택일'] . '</td>';
+                echo '<td data-contact="' . $row221['휴대폰번호'] . '">' . $row221['휴대폰번호'] . '</td>';
+                echo '<td>' . $row221['시'] . '</td>';
+                echo '<td>' . $row221['구'] . '</td>';
+                echo '<td>' . $row221['구분'] . '</td>';
+                echo '<td>' . $row221['max_edate'] . '</td>';
+                echo '<td>' . $row221['가입일'] . '</td>';
+                //echo '<td>' . (strlen($row221['메모']) > 30 ? substr($row221['메모'], 0, 40) . "..." : $row221['메모']) . '</td>';
+                //echo '<td>' . $row221['문자동의'] . '</td>';
+                echo '<td>' . $row221['관리담당자'] . '</td>';
+                //echo '<td>' . $row221['컨택일'] . '</td>';
                
                 echo '</tr>';
             }

@@ -172,13 +172,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Add other column headers as needed
             echo '</tr>';
             echo '</thead>';
+
+            echo '<script>';
+            echo 'var modalId = "";'; 
+            echo '</script>';
+
             echo '<tbody>';
             while ($row221 = $result222->fetch_assoc()) {
                 echo '<tr>';
-                    $href = $row221['고유키'] ? 'update_customer.php?num=' . urlencode($row221['고유키']) : 'update_target.php?num=' . urlencode($row221['num']);
-                    $text = $row221['고유키'] ? '기가입' : $row221['num'];
-
-                echo '<td><a href="' . $href . '" class="num-link">' . $text . '</a></td>';
+                $modalId = 'modal' . ($row221['고유키'] ?: $row221['num']);
+            
+                echo '<td>';
+                echo '<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#' . $modalId . '">';
+                echo $row221['고유키'] ? '기가입' : $row221['num'];
+                echo '</button>';
+                echo '</td>';
                 echo '<td>' . $row221['업체명'] . '</td>';
                 echo '<td>' . $row221['대표자명'] . '</td>';
                 echo '<td data-contact="' . $row221['연락처'] . '">' . $row221['연락처'] . '</td>';
@@ -191,6 +199,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo '<td>' . $row221['담당자'] . '</td>';
                 echo '<td>' . $row221['컨택일'] . '</td>';
                 echo '</tr>';
+                echo '<script>';
+            echo 'var modalId = "' . $modalId . '";';
+            echo 'var modal = document.createElement("div");';
+            echo 'modal.className = "modal fade";';
+            echo 'modal.id = modalId;';
+            echo 'modal.setAttribute("data-bs-keyboard", "false");';
+            echo 'modal.setAttribute("tabindex", "-1");';
+            echo 'modal.setAttribute("aria-labelledby", modalId + "Label");';
+            echo 'modal.setAttribute("aria-hidden", "true");';
+            echo 'modal.innerHTML = `';
+            echo '<div class="modal-dialog modal-xl">';
+            echo '<div class="modal-content" style="width:1500px;">';
+            echo '<div class="modal-header">';
+            echo '<h1 class="modal-title fs-5" id="${modalId}Label">Modal title</h1>';
+            echo '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+            echo '</div>';
+            echo '<div class="modal-body" style="height: 800px;" id="${modalId}Content">';
+            echo '<iframe src="' . ($row221['고유키'] ? 'update_customer.php?num=' . urlencode($row221['고유키']) : 'update_target.php?num=' . urlencode($row221['num'])) . '" class="num-link" frameborder="0" width="100%" height="750px"></iframe>';
+            echo '</div>';
+            echo '<div class="modal-footer">';
+            echo '<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>';
+            echo '</div>';
+            echo '</div>';
+            echo '</div>';
+            echo '</div>`;';
+            echo 'document.body.appendChild(modal);';
+            echo '</script>';
             }
             echo '</tbody>';
             echo '</table>';
