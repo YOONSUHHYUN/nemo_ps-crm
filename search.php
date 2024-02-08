@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("데이터베이스 연결 실패: " . $conn->connect_error);
     }
 
-    if (isset($_POST['selected_agent']) || isset($_POST['selected_status'])) {
+    if ((isset($_POST['selected_agent']) && $_POST['selected_agent'] !== 'null') && isset($_POST['selected_status'])) {
         // 선택한 담당자와 현상태
         $selectedAgent = $_POST['selected_agent'];
         $selectedStatus = isset($_POST['selected_status']) ? $_POST['selected_status'] : '';
@@ -151,6 +151,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             die("쿼리 실행 실패: " . $conn->error); // Add error handling to show the query error message
         }
 
+
+        // 총 페이지 수 계산
+        $itemsPerPage = 20;
+        $totalPages = ceil($result222->num_rows / $itemsPerPage);
+
+        // 현재 페이지 번호 가져오기 (기본값: 1)
+        $pageNumber = isset($_POST['page']) ? intval($_POST['page']) : 1;
+
+        // 가져올 데이터의 시작 인덱스 계산
+        $startIndex = ($pageNumber - 1) * $itemsPerPage;
+
+        // 수정된 SQL 쿼리
+        $sql222 .= " LIMIT $startIndex, $itemsPerPage";
+        //페이지게이션 디버깅
+        //echo "startIndex: $startIndex<br>";
+        //echo "itemsPerPage: $itemsPerPage<br>";
+        // SQL 쿼리 실행
+        $result222 = $conn->query($sql222);
+
+        if (isset($_POST['selected_agent']) && $_POST['selected_agent'] !== 'null' || isset($_POST['selected_status'])) {
+            // 선택한 담당자와 현상태
+            $selectedAgent = $_POST['selected_agent'];
+            //echo "selectedAgent: $selectedAgent<br>"; // 디버깅용 출력
+
+
         // 쿼리 결과 처리
         if ($result222->num_rows > 0) {
             echo '<div class="table-responsive">';
@@ -229,7 +254,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             echo '</tbody>';
             echo '</table>';
-            echo '</div>';
+             // 페이지 버튼 생성
+             echo '<div id="pagination">';
+             echo '<nav aria-label="Page navigation example">';
+             echo '<ul class="pagination justify-content-center">';
+             
+             // 이전 페이지 링크 출력
+             if ($pageNumber > 1) {
+                 echo '<li class="page-item"><a class="page-link" href="#" onclick="goToPage('.($pageNumber - 1).')">이전</a></li>';
+             }
+             
+             // 페이지 번호 출력
+             $startPage = max(1, min($pageNumber - 10, $totalPages - 19));
+             $endPage = min($startPage + 19, $totalPages);
+             for ($i = $startPage; $i <= $endPage; $i++) {
+                 $class = ($i == $pageNumber) ? 'active' : '';
+                 echo '<li class="page-item '.$class.'"><a class="page-link" href="#" onclick="goToPage('.$i.')">'.$i.'</a></li>';
+             }
+             
+             // 다음 페이지 링크 출력
+             if ($pageNumber < $totalPages) {
+                 echo '<li class="page-item"><a class="page-link" href="#" onclick="goToPage('.($pageNumber + 1).')">다음</a></li>';
+             }
+             
+             echo '</ul>';
+             echo '</nav>';
+             
+ echo '</div>';
         } else {
             echo "결과가 없습니다.";
         }
@@ -238,11 +289,67 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         echo "선택한 담당자가 없습니다.";
     }
-}
+}}
 ?>
  
 
+ <script>
+    // 총 페이지 수 계산
+    var totalPages = <?php echo $totalPages; ?>;
+    var currentPage = <?php echo $pageNumber; ?>;
 
+    // 페이지 버튼을 생성하고 이벤트 처리를 추가하는 함수
+    function createPaginationButtons() {
+        var paginationContainer = document.getElementById('pagination');
+
+        for (var i = 1; i <= totalPages; i++) {
+            var button = document.createElement('button');
+            button.textContent = i;
+            button.addEventListener('click', function() {
+                getPageData(parseInt(this.textContent));
+            });
+            paginationContainer.appendChild(button);
+        }
+    }
+
+    // 페이지 데이터 가져오는 함수
+    function getPageData(page) {
+        var selectedAgent = $("#agent").val();
+        var selectedStatus = $("#status").val();
+        var selectedAddress1 = $("#address1").val();
+        var selectedAddress2 = $("#address2").val();
+        var selectedDate = $("#selectdate").val();
+        var selectedSearch = $("#selectsearch").val();
+
+        $.ajax({
+            type: "POST",
+            url: "search.php",
+            data: {
+                page: page,
+                selected_agent: selectedAgent,
+                selected_status: selectedStatus,
+                selected_address1: selectedAddress1,
+                selected_address2: selectedAddress2,
+                selected_Date: selectedDate,
+                selected_Search: selectedSearch
+            },
+            success: function(response) {
+                $("#result").html(response);
+                currentPage = page;
+            },
+            error: function(xhr, status, error) {
+                console.error("Ajax 요청 실패:", error);
+            }
+        });
+    }
+
+    // 페이지 버튼 생성 호출
+    //createPaginationButtons();
+
+    function goToPage(page) {
+    getPageData(page);
+}
+</script>
 
 
  <script>

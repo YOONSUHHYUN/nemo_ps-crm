@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("데이터베이스 연결 실패: " . $conn->connect_error);
     }
 
-    if (isset($_POST['selected_agent']) || isset($_POST['selected_status'])) {
+    if ((isset($_POST['selected_agent']) && $_POST['selected_agent'] !== 'null') && isset($_POST['selected_status'])) {
         // 선택한 담당자와 현상태
         $selectedAgent = $_POST['selected_agent'];
         $selectedStatus = isset($_POST['selected_status']) ? $_POST['selected_status'] : '';
@@ -37,14 +37,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ON A.고유키 = B.`업체아이디`
         where 1=1 ";
 
-        //if (!empty($selectedAgent)) {
-        //    $selectedAgent = mysqli_real_escape_string($conn, $selectedAgent);
-         //   $sql222 .= " AND `관리담당자` = '$selectedAgent'";
-        //}
-
-        if (!empty($selectedAgent)) {
+        if (!empty($selectedAgent) && $selectedAgent !== 'null') {
             $selectedAgent = mysqli_real_escape_string($conn, $selectedAgent);
-        
+
             $퇴사자List = array('퇴사자');
             if (in_array($selectedAgent, $퇴사자List)) {
                 $sql222 .= " AND (`관리담당자` NOT IN ('윤서현', '이다영', '최효주', '이민성', '김윤석', '홍석환', '이수복') OR `관리담당자` IS NULL)";
@@ -58,19 +53,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $sql222 .= " AND `구분` = '$selectedStatus'";
         }
 
-        
- 
-
         if (!empty($selectedAddress1)) {
             $selectedAddress1 = mysqli_real_escape_string($conn, $selectedAddress1);
             $sql222 .= " AND `시` = '$selectedAddress1'";
         }
-        
+
         if (!empty($selectedAddress2)) {
             $selectedAddress2 = mysqli_real_escape_string($conn, $selectedAddress2);
             $sql222 .= " AND `구` = '$selectedAddress2'";
         }
-        
+
         if (!empty($selectedDate)) {
             $selectedDate = mysqli_real_escape_string($conn, $selectedDate);
             $sql222 .= " AND DATE_FORMAT(`컨택일`, '%Y-%m-%d') <= '$selectedDate'";
@@ -89,6 +81,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!$result222) {
             die("쿼리 실행 실패: " . $conn->error); // Add error handling to show the query error message
         }
+
+        // 총 페이지 수 계산
+        $itemsPerPage = 20;
+        $totalPages = ceil($result222->num_rows / $itemsPerPage);
+
+        // 현재 페이지 번호 가져오기 (기본값: 1)
+        $pageNumber = isset($_POST['page']) ? intval($_POST['page']) : 1;
+
+        // 가져올 데이터의 시작 인덱스 계산
+        $startIndex = ($pageNumber - 1) * $itemsPerPage;
+
+        // 수정된 SQL 쿼리
+        $sql222 .= " LIMIT $startIndex, $itemsPerPage";
+        //페이지게이션 디버깅
+        //echo "startIndex: $startIndex<br>";
+        //echo "itemsPerPage: $itemsPerPage<br>";
+        // SQL 쿼리 실행
+        $result222 = $conn->query($sql222);
+
+        if (isset($_POST['selected_agent']) && $_POST['selected_agent'] !== 'null' || isset($_POST['selected_status'])) {
+            // 선택한 담당자와 현상태
+            $selectedAgent = $_POST['selected_agent'];
+            //echo "selectedAgent: $selectedAgent<br>"; // 디버깅용 출력
+
 
         // 쿼리 결과 처리
         if ($result222->num_rows > 0) {
@@ -109,19 +125,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo '<th>관리담당자</th>';
             echo '</tr>';
             echo '</thead>';
-
+    
             echo '<script>';
             echo 'var modalId = "";'; 
             echo '</script>';
-
+    
             echo '<tbody>';
             while ($row221 = $result222->fetch_assoc()) {
                  echo '<tr>';
-                $modalId = 'modal' . ($row221['고유키'] ?: $row221['num']);
+                $modalId = 'modal' . $row221['고유키'] ;
             
                 echo '<td>';
                 echo '<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#' . $modalId . '">';
-                echo $row221['고유키'] ? '기가입' : $row221['num'];
+                echo '기가입';
                 echo '</button>';
                 echo '</td>';
                 echo '<td>' . $row221['중개업소명'] . '</td>';
@@ -155,7 +171,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
             echo '</div>';
             echo '<div class="modal-body" style="height: 800px;" id="${modalId}Content">';
-            echo '<iframe src="' . ($row221['고유키'] ? 'update_customer.php?num=' . urlencode($row221['고유키']) : 'update_target.php?num=' . urlencode($row221['num'])) . '" class="num-link" frameborder="0" width="100%" height="750px"></iframe>';
+            echo '<iframe src="' . 'update_customer.php?num=' . urlencode($row221['고유키'])  . '" class="num-link" frameborder="0" width="100%" height="750px"></iframe>';
             echo '</div>';
             echo '<div class="modal-footer">';
             echo '<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>';
@@ -168,21 +184,100 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             echo '</tbody>';
             echo '</table>';
-            echo '</div>';
+            // 페이지 버튼 생성
+            echo '<div id="pagination">';
+            echo '<nav aria-label="Page navigation example">';
+            echo '<ul class="pagination justify-content-center">';
+            
+            // 이전 페이지 링크 출력
+            if ($pageNumber > 1) {
+                echo '<li class="page-item"><a class="page-link" href="#" onclick="goToPage('.($pageNumber - 1).')">이전</a></li>';
+            }
+            
+            // 페이지 번호 출력
+            $startPage = max(1, min($pageNumber - 10, $totalPages - 19));
+            $endPage = min($startPage + 19, $totalPages);
+            for ($i = $startPage; $i <= $endPage; $i++) {
+                $class = ($i == $pageNumber) ? 'active' : '';
+                echo '<li class="page-item '.$class.'"><a class="page-link" href="#" onclick="goToPage('.$i.')">'.$i.'</a></li>';
+            }
+            
+            // 다음 페이지 링크 출력
+            if ($pageNumber < $totalPages) {
+                echo '<li class="page-item"><a class="page-link" href="#" onclick="goToPage('.($pageNumber + 1).')">다음</a></li>';
+            }
+            
+            echo '</ul>';
+            echo '</nav>';
+            
+echo '</div>';
         } else {
             echo "결과가 없습니다.";
         }
-
         $conn->close();
-    } else {
+    }
+    else {
         echo "선택한 담당자가 없습니다.";
     }
-}
+}}
 ?>
- 
+ <script>
+    // 총 페이지 수 계산
+    var totalPages = <?php echo $totalPages; ?>;
+    var currentPage = <?php echo $pageNumber; ?>;
 
+    // 페이지 버튼을 생성하고 이벤트 처리를 추가하는 함수
+    function createPaginationButtons() {
+        var paginationContainer = document.getElementById('pagination');
 
+        for (var i = 1; i <= totalPages; i++) {
+            var button = document.createElement('button');
+            button.textContent = i;
+            button.addEventListener('click', function() {
+                getPageData(parseInt(this.textContent));
+            });
+            paginationContainer.appendChild(button);
+        }
+    }
 
+    // 페이지 데이터 가져오는 함수
+    function getPageData(page) {
+        var selectedAgent = $("#agent").val();
+        var selectedStatus = $("#status").val();
+        var selectedAddress1 = $("#address1").val();
+        var selectedAddress2 = $("#address2").val();
+        var selectedDate = $("#selectdate").val();
+        var selectedSearch = $("#selectsearch").val();
+
+        $.ajax({
+            type: "POST",
+            url: "admin_customer.php",
+            data: {
+                page: page,
+                selected_agent: selectedAgent,
+                selected_status: selectedStatus,
+                selected_address1: selectedAddress1,
+                selected_address2: selectedAddress2,
+                selected_Date: selectedDate,
+                selected_Search: selectedSearch
+            },
+            success: function(response) {
+                $("#result").html(response);
+                currentPage = page;
+            },
+            error: function(xhr, status, error) {
+                console.error("Ajax 요청 실패:", error);
+            }
+        });
+    }
+
+    // 페이지 버튼 생성 호출
+    //createPaginationButtons();
+
+    function goToPage(page) {
+    getPageData(page);
+}
+</script>
 
  <script>
 

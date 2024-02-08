@@ -1,7 +1,6 @@
 
 
 <?php
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -23,103 +22,98 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $selectedStatus = isset($_POST['selected_status']) ? $_POST['selected_status'] : '';
         $selectedAddress1 = isset($_POST['selected_address1']) ? $_POST['selected_address1'] : '';
         $selectedAddress2 = isset($_POST['selected_address2']) ? $_POST['selected_address2'] : '';
-        $selectedDate = isset($_POST['selected_Date']) ? $_POST['selected_Date'] : '';
+
 
         // SQL 쿼리 생성
         $sql222 = "
+        SELECT 		combined2.num,
+            combined2.업체명,
+            combined2.대표자명,
+            combined2.시도,
+            combined2.시군구,
+            combined2.연락처,
+                combined2.고유키,
+            combined2.담당자,
+            combined2.수신,
+            combined2.회사소개,
+            combined2.상품소개,
+            combined2.결제여부,
+            combined2.관심도,
+            combined2.현상태,
+            combined2.메모,
+                combined2.문자동의,
+            combined2.컨택일,
+                combined2.rn
         
-
-SELECT 		
-combined2.구분,
-combined2.num,
-combined2.업체명,
-combined2.대표자명,
-combined2.시도,
-combined2.시군구,
-combined2.연락처,
-combined2.고유키,
-combined2.담당자,
-combined2.수신,
-combined2.회사소개,
-combined2.상품소개,
-combined2.결제여부,
-combined2.관심도,
-combined2.현상태,
-combined2.메모,
-combined2.문자동의,
-combined2.컨택일,
-combined2.rn
-FROM (
-SELECT 
-    combined.`구분`,
-    combined.num,
-    combined.업체명,
-    combined.대표자명,
-    combined.시도,
-    combined.시군구,
-    combined.연락처,
-    combined.고유키,
-    combined.담당자,
-    combined.수신,
-    combined.회사소개,
-    combined.상품소개,
-    combined.결제여부,
-    combined.관심도,
-    combined.현상태,
-    combined.메모,
-    combined.문자동의,
-    combined.컨택일,
-    ROW_NUMBER() OVER (PARTITION BY `연락처` ORDER BY `컨택일` DESC) AS rn
-FROM (
-    SELECT 
-        customer.`구분`,
-        customer.`고유키` as num,
-        customer.`중개업소명` as 업체명,
-        customer.`대표자명`,
-        customer.`시` as 시도,
-        customer.`구` as 시군구,
-        customer.`휴대폰번호` as 연락처,
-        customer.고유키,
-        agent.`담당자`,
-        agent.`수신`,
-        agent.`회사소개`,
-        agent.`상품소개`,
-        agent.`결제여부`,
-        agent.`관심도`,
-        agent.`현상태`,
-        agent.`메모`,
-        agent.`문자동의`,
-        agent.`컨택일`
-    FROM customer
-    LEFT JOIN agent ON customer.고유키 = agent.num 
-
-    UNION ALL
-
-    SELECT 
-        target.`구분`,
-        target.num,
-        target.`업체명`,
-        target.`대표자명`,
-        target.`시도`,
-        target.`시군구`,
-        target.`연락처`,
-        target.`고유키`,
-        agent.`담당자`,
-        agent.`수신`,
-        agent.`회사소개`,
-        agent.`상품소개`,
-        agent.`결제여부`,
-        agent.`관심도`,
-        agent.`현상태`,
-        agent.`메모`,
-        agent.`문자동의`,
-        agent.`컨택일`
-    FROM target 
-    LEFT JOIN agent ON target.num = agent.num
-) AS combined
-ORDER BY combined.컨택일 DESC
-) AS combined2
-WHERE rn = 1 and (구분 = '무료' or 구분 is null) and 수신 = '문자' and `문자동의` = 'O' ";
+        
+        FROM (
+        SELECT 
+            combined.num,
+            combined.업체명,
+            combined.대표자명,
+            combined.시도,
+            combined.시군구,
+            combined.연락처,
+                combined.고유키,
+            combined.담당자,
+            combined.수신,
+            combined.회사소개,
+            combined.상품소개,
+            combined.결제여부,
+            combined.관심도,
+            combined.현상태,
+            combined.메모,
+                combined.문자동의,
+            combined.컨택일,
+                ROW_NUMBER() OVER (PARTITION BY `num` ORDER BY `컨택일` DESC) AS rn
+        FROM (
+            SELECT 
+                customer.`고유키` as num,
+                customer.`중개업소명` as 업체명,
+                customer.`대표자명`,
+                customer.`시` as 시도,
+                customer.`구` as 시군구,
+                customer.`휴대폰번호` as 연락처,
+                        customer.고유키,
+                agent.`담당자`,
+                agent.`수신`,
+                agent.`회사소개`,
+                agent.`상품소개`,
+                agent.`결제여부`,
+                agent.`관심도`,
+                agent.`현상태`,
+                agent.`메모`,
+                        agent.`문자동의`,
+                agent.`컨택일`
+            FROM customer
+            LEFT JOIN agent ON customer.고유키 = agent.num 
+                where 수신 <> '문자' AND `수신` <> '실패'
+            UNION ALL
+            SELECT 
+                target.num,
+                target.`업체명`,
+                target.`대표자명`,
+                target.`시도`,
+                target.`시군구`,
+                target.`연락처`,
+                        target.`고유키`,
+                agent.`담당자`,
+                agent.`수신`,
+                agent.`회사소개`,
+                agent.`상품소개`,
+                agent.`결제여부`,
+                agent.`관심도`,
+                agent.`현상태`,
+                agent.`메모`,
+                        agent.`문자동의`,
+                agent.`컨택일`
+            FROM target 
+            LEFT JOIN agent ON target.num = agent.num
+                where 수신 <> '문자' AND `수신` <> '실패'
+        ) AS combined ORDER BY combined.컨택일 DESC
+        )AS combined2
+        where rn = 1
+        AND `문자동의` IN ('O') ";
 
         if (!empty($selectedAgent)) {
             $selectedAgent = mysqli_real_escape_string($conn, $selectedAgent);
@@ -147,11 +141,6 @@ WHERE rn = 1 and (구분 = '무료' or 구분 is null) and 수신 = '문자' and
             $sql222 .= " AND `시군구` = '$selectedAddress2'";
         }
         
-        if (!empty($selectedDate)) {
-            $selectedDate = mysqli_real_escape_string($conn, $selectedDate);
-            $sql222 .= " AND DATE_FORMAT(`컨택일`, '%Y-%m-%d') <= '$selectedDate'";
-        }
-
         $sql222 .= " ORDER BY combined2.컨택일 DESC";
 
         // SQL 쿼리 실행
@@ -168,15 +157,14 @@ WHERE rn = 1 and (구분 = '무료' or 구분 is null) and 수신 = '문자' and
             echo '<table class="table table-bordered table-striped">';
             echo '<thead>';
             echo '<tr>';
-            
             echo '<th>NUM</th>';
             echo '<th>업체명</th>';
             echo '<th>대표자명</th>';
             echo '<th><button id="copyContactsButton">연락처 복사</button></th>';
             echo '<th>주소1</th>';
             echo '<th>주소2</th>';
-            //echo '<td><select name="address2" id="address2" class="form-control"></select></td>';
-            echo '<th>구분(유/무료)</th>';
+            echo '<th>관심도</th>';
+            echo '<th>현상태</th>';
             echo '<th>메모</th>';
             echo '<th>문자동의</th>';
             echo '<th>담당자</th>';
@@ -184,25 +172,60 @@ WHERE rn = 1 and (구분 = '무료' or 구분 is null) and 수신 = '문자' and
             // Add other column headers as needed
             echo '</tr>';
             echo '</thead>';
+
+            echo '<script>';
+            echo 'var modalId = "";'; 
+            echo '</script>';
+
             echo '<tbody>';
             while ($row221 = $result222->fetch_assoc()) {
                 echo '<tr>';
-                $href = $row221['고유키'] ? 'update_customer.php?num=' . urlencode($row221['고유키']) : 'update_target.php?num=' . urlencode($row221['num']);
-                $text = $row221['고유키'] ? '기가입' : $row221['num'];
-
-            echo '<td><a href="' . $href . '" class="num-link">' . $text . '</a></td>';
-            echo '<td>' . $row221['업체명'] . '</td>';
-            echo '<td>' . $row221['대표자명'] . '</td>';
-            echo '<td data-contact="' . $row221['연락처'] . '">' . $row221['연락처'] . '</td>';
-            echo '<td>' . $row221['시도'] . '</td>';
-            echo '<td>' . $row221['시군구'] . '</td>';
-            echo '<td>' . $row221['구분'] . '</td>';
-
-            echo '<td>' . (strlen($row221['메모']) > 30 ? substr($row221['메모'], 0, 40) . "..." : $row221['메모']) . '</td>';
-            echo '<td>' . $row221['문자동의'] . '</td>';
-            echo '<td>' . $row221['담당자'] . '</td>';
-            echo '<td>' . $row221['컨택일'] . '</td>';
-            echo '</tr>';
+                $modalId = 'modal' . ($row221['고유키'] ?: $row221['num']);
+            
+                echo '<td>';
+                echo '<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#' . $modalId . '">';
+                echo $row221['고유키'] ? '기가입' : $row221['num'];
+                echo '</button>';
+                echo '</td>';
+                echo '<td>' . $row221['업체명'] . '</td>';
+                echo '<td>' . $row221['대표자명'] . '</td>';
+                echo '<td data-contact="' . $row221['연락처'] . '">' . $row221['연락처'] . '</td>';
+                echo '<td>' . $row221['시도'] . '</td>';
+                echo '<td>' . $row221['시군구'] . '</td>';
+                echo '<td>' . $row221['관심도'] . '</td>';
+                echo '<td>' . $row221['현상태'] . '</td>';
+                echo '<td>' . (strlen($row221['메모']) > 30 ? substr($row221['메모'], 0, 40) . "..." : $row221['메모']) . '</td>';
+                echo '<td>' . $row221['문자동의'] . '</td>';
+                echo '<td>' . $row221['담당자'] . '</td>';
+                echo '<td>' . $row221['컨택일'] . '</td>';
+                echo '</tr>';
+                echo '<script>';
+            echo 'var modalId = "' . $modalId . '";';
+            echo 'var modal = document.createElement("div");';
+            echo 'modal.className = "modal fade";';
+            echo 'modal.id = modalId;';
+            echo 'modal.setAttribute("data-bs-keyboard", "false");';
+            echo 'modal.setAttribute("tabindex", "-1");';
+            echo 'modal.setAttribute("aria-labelledby", modalId + "Label");';
+            echo 'modal.setAttribute("aria-hidden", "true");';
+            echo 'modal.innerHTML = `';
+            echo '<div class="modal-dialog modal-xl">';
+            echo '<div class="modal-content" style="width:1500px;">';
+            echo '<div class="modal-header">';
+            echo '<h1 class="modal-title fs-5" id="${modalId}Label">Modal title</h1>';
+            echo '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+            echo '</div>';
+            echo '<div class="modal-body" style="height: 800px;" id="${modalId}Content">';
+            echo '<iframe src="' . ($row221['고유키'] ? 'update_customer.php?num=' . urlencode($row221['고유키']) : 'update_target.php?num=' . urlencode($row221['num'])) . '" class="num-link" frameborder="0" width="100%" height="750px"></iframe>';
+            echo '</div>';
+            echo '<div class="modal-footer">';
+            echo '<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>';
+            echo '</div>';
+            echo '</div>';
+            echo '</div>';
+            echo '</div>`;';
+            echo 'document.body.appendChild(modal);';
+            echo '</script>';
             }
             echo '</tbody>';
             echo '</table>';

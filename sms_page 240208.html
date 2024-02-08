@@ -89,8 +89,7 @@
             var selectedAddress1 = $("#address1").val();
             var selectedAddress2 = $("#address2").val();
             var selectedDate = $("#selectdate").val();
-            var page = $("#page").val();
-            return { page: page, selected_agent: selectedAgent, selected_status: selectedStatus, selected_address1: selectedAddress1, selected_address2: selectedAddress2, selected_Date:selectedDate };
+            return { selected_agent: selectedAgent, selected_status: selectedStatus, selected_address1: selectedAddress1, selected_address2: selectedAddress2, selected_Date:selectedDate };
         }
 
         function fetchResults() {
@@ -116,7 +115,7 @@
         }
 
         // Additional event handling to trigger AJAX request when the select option is changed
-        $("#page, #agent, #status, #address1, #address2, #selectdate").on("change", function () {
+        $("#agent, #status, #address1, #address2, #selectdate").on("change", function () {
             // Clear the previous results before fetching new ones
             $("#result").html("");
             fetchResults();

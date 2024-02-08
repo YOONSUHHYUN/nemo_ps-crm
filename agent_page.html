@@ -25,7 +25,7 @@
         <nav class="navbar navbar-dark bg-dark d-flex justify-content-center">
             <div id="agentFormContainer">
                 <select name="selected_agent" id="agent">
-                    <option value="">담당자</option>
+                    <option value="담당자">담당자</option>
                     <option value="윤서현">윤서현</option>
                     <option value="이다영">이다영</option>
                     <option value="이지나">이지나</option>
@@ -84,7 +84,8 @@
             var selectedStatus = $("#status").val();
             var selectedAddress1 = $("#address1").val();
             var selectedAddress2 = $("#address2").val();
-            return { selected_agent: selectedAgent, selected_status: selectedStatus, selected_address1: selectedAddress1, selected_address2: selectedAddress2 };
+            var page = $("#page").val();
+            return { page: page, selected_agent: selectedAgent, selected_status: selectedStatus, selected_address1: selectedAddress1, selected_address2: selectedAddress2 };
         }
 
         function fetchResults() {
@@ -110,7 +111,7 @@
         }
 
         // Additional event handling to trigger AJAX request when the select option is changed
-        $("#agent, #status, #address1, #address2").on("change", function () {
+        $("#page, #agent, #status, #address1, #address2").on("change", function () {
             // Clear the previous results before fetching new ones
             $("#result").html("");
             fetchResults();

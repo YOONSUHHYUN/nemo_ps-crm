@@ -25,7 +25,7 @@
         <nav class="navbar navbar-dark bg-dark d-flex justify-content-center">
             <div id="agentFormContainer">
                 <select name="selected_agent" id="agent">
-                    <option value="none">담당자</option>
+                    <option value="담당자">담당자</option>
                     <option value="윤서현">윤서현</option>
                     <option value="이다영">이다영</option>
                     <option value="이지나">이지나</option>
@@ -40,6 +40,7 @@
                     <option value="관리1">관리1(이탈)</option>
                     <option value="관리2">관리2(애매)</option>
                     <option value="관리3">관리3(긍정)</option>
+                    <option value="결제성공">결제성공</option>
                 </select>
             </div>
 
@@ -65,14 +66,9 @@
                 <option value="제주특별자치도">제주특별자치도</option>
             </select>
             </div>
-
         <div id="statusFormContainer">
             <select name="address2" id="address2" class="form-control"></select>
         </div>
-        
-
-        <input type="date" name="selectdate" id="selectdate"  />
-
     </nav>
     <div id="result"></div>
 </div>
@@ -88,9 +84,7 @@
             var selectedStatus = $("#status").val();
             var selectedAddress1 = $("#address1").val();
             var selectedAddress2 = $("#address2").val();
-            var selectedDate = $("#selectdate").val();
-            var page = $("#page").val();
-            return { page: page, selected_agent: selectedAgent, selected_status: selectedStatus, selected_address1: selectedAddress1, selected_address2: selectedAddress2, selected_Date:selectedDate };
+            return { selected_agent: selectedAgent, selected_status: selectedStatus, selected_address1: selectedAddress1, selected_address2: selectedAddress2 };
         }
 
         function fetchResults() {
@@ -104,7 +98,7 @@
             // Ajax request for both selected agent and selected status
             request = $.ajax({
                 type: "POST",
-                url: "sms_search.php", // Use the new search.php file for the AJAX request
+                url: "search.php", // Use the new search.php file for the AJAX request
                 data: getSelectedData(),
                 success: function (response) {
                     $("#result").html(response);
@@ -116,7 +110,7 @@
         }
 
         // Additional event handling to trigger AJAX request when the select option is changed
-        $("#page, #agent, #status, #address1, #address2, #selectdate").on("change", function () {
+        $("#agent, #status, #address1, #address2").on("change", function () {
             // Clear the previous results before fetching new ones
             $("#result").html("");
             fetchResults();
@@ -183,6 +177,7 @@
         }
     }
 </script>
+
 
 
 

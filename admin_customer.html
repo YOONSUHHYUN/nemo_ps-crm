@@ -25,7 +25,8 @@
         <nav class="navbar navbar-dark bg-dark d-flex justify-content-center">
             <div id="agentFormContainer">
                 <select name="selected_agent" id="agent">
-                    <option value="">담당자</option>
+                    <option value="null">담당자</option>
+                    <option value="">전체</option>
                     <option value="윤서현">윤서현</option>
                     <option value="이다영">이다영</option>
                     <option value="최효주">최효주</option>
@@ -36,7 +37,7 @@
             
             <div id="statusFormContainer">
                 <select name="selected_status" id="status">
-                    <option value="">전체</option>
+                    <option value="">유/무료</option>
                     <option value="유료">유료</option>
                     <option value="무료">무료</option>
                     
@@ -45,7 +46,7 @@
 
             <div id="statusFormContainer">
                 <select name="address1" id="address1" class="form-control">
-                <option value="">주소1</option>
+                <option value="">시도</option>
                 <option value="서울특별시">서울특별시</option>
                 <option value="부산광역시">부산광역시</option>
                 <option value="대구광역시">대구광역시</option>
@@ -91,7 +92,8 @@
             var selectedAddress2 = $("#address2").val();
             var selectedDate = $("#selectdate").val();
             var selectedSearch = $("#selectsearch").val();
-            return { selected_agent: selectedAgent, selected_status: selectedStatus, selected_address1: selectedAddress1, selected_address2: selectedAddress2, selected_Date:selectedDate, selected_Search:selectedSearch };
+            var page = $("#page").val();
+            return { page: page, selected_agent: selectedAgent, selected_status: selectedStatus, selected_address1: selectedAddress1, selected_address2: selectedAddress2, selected_Date:selectedDate, selected_Search:selectedSearch };
         }
 
         function fetchResults() {
@@ -117,7 +119,7 @@
         }
 
         // Additional event handling to trigger AJAX request when the select option is changed
-        $("#agent, #status, #address1, #address2, #selectdate, #selectsearch").on("change", function () {
+        $("#page, #agent, #status, #address1, #address2, #selectdate, #selectsearch").on("change", function () {
             // Clear the previous results before fetching new ones
             $("#result").html("");
             fetchResults();
