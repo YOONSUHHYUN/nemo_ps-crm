@@ -44,6 +44,8 @@
           }
         }
         
+       
+        #selectdate,
         #address1,
         #address2 {
           /* CSS 스타일 추가 */
@@ -58,7 +60,7 @@
             linear-gradient(to left, var(--arrow-bg) 3em, var(--select-bg) 3em);
           color: white;
           border-radius: 0.25em;
-          /* box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);*/
+          box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
           cursor: pointer;
           /* Remove IE arrow */
           &::-ms-expand {
@@ -74,27 +76,14 @@
             background-color: var(--option-bg);
           }
         }
-
-            #address1:hover {
-            color : #fe2d54;
-        }
-
-        #address2:hover {
-            color: #fe2d54;
-        }
-
-        select:hover {
-            color: #fe2d54;
-        }
-
-        #selectdate:hover {
-            color: #fe2d54;
-        }
         
-
+        #selectsearch {
+  /* 크기 조정 */
+  width: 20rem;
+  padding: 1rem 4rem 1rem 1rem;
+}
         .navbar {
-    background-color:#383838;
-    border-bottom: solid 3px #fe2d54;
+    background: linear-gradient(to left, #ffffff 0%, #fe2b54 50%, #fe2b54 100%);
 }
         </style>
 
@@ -111,20 +100,22 @@
         <nav class="navbar navbar-dark bg-dark d-flex justify-content-center">
             <div id="agentFormContainer">
                 <select name="selected_agent" id="agent">
-                    <option value="담당자">담당자</option>
+                    <option style="background-color: #FF0000" value="null">담당자</option>
+                    <option style="background-color: #FF0000" value="">전체</option>
                     <option value="윤서현">윤서현</option>
                     <option value="이다영">이다영</option>
                     <option value="최효주">최효주</option>
+                    <option value="퇴사자">퇴사자</option>
+                    
                 </select>
             </div>
             
             <div id="statusFormContainer">
                 <select name="selected_status" id="status">
-                    <option value="1">전체</option>
-                    <option value="관리1">관리1(이탈)</option>
-                    <option value="관리2">관리2(애매)</option>
-                    <option value="관리3">관리3(긍정)</option>
-                    <option value="결제성공">결제성공</option>
+                    <option value="">유/무료</option>
+                    <option value="유료">유료</option>
+                    <option value="무료">무료</option>
+                    
                 </select>
             </div>
 
@@ -150,15 +141,70 @@
                 <option value="제주특별자치도">제주특별자치도</option>
             </select>
             </div>
+
         <div id="statusFormContainer">
             <select name="address2" id="address2" class="form-control"></select>
         </div>
+        
+
+        <input type="date" name="selectdate" id="selectdate"  />
+        <input type="text" name="selectsearch" id="selectsearch" placeholder="Search by 대표자명, 업체명, or 연락처">
+
     </nav>
     <div id="result"></div>
 </div>
     
 </br></br></br></br></br></br>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var request;
+
+        function getSelectedData() {
+            var selectedAgent = $("#agent").val();
+            var selectedStatus = $("#status").val();
+            var selectedAddress1 = $("#address1").val();
+            var selectedAddress2 = $("#address2").val();
+            var selectedDate = $("#selectdate").val();
+            var selectedSearch = $("#selectsearch").val();
+            var page = $("#page").val();
+            return { page: page, selected_agent: selectedAgent, selected_status: selectedStatus, selected_address1: selectedAddress1, selected_address2: selectedAddress2, selected_Date:selectedDate, selected_Search:selectedSearch };
+        }
+
+        function fetchResults() {
+            if (request && request.readyState !== 4) {
+                request.abort();
+            }
+
+            // Clear the previous results before fetching new ones
+            $("#result").html("");
+
+            // Ajax request for both selected agent and selected status
+            request = $.ajax({
+                type: "POST",
+                url: "admin_customer.php", // Use the new search.php file for the AJAX request
+                data: getSelectedData(),
+                success: function (response) {
+                    $("#result").html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Ajax 요청 실패:", error);
+                }
+            });
+        }
+
+        // Additional event handling to trigger AJAX request when the select option is changed
+        $("#page, #agent, #status, #address1, #address2, #selectdate, #selectsearch").on("change", function () {
+            // Clear the previous results before fetching new ones
+            $("#result").html("");
+            fetchResults();
+        });
+
+        // Initial AJAX request when the page loads
+        fetchResults();
+    });
+</script>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -176,56 +222,6 @@
 </script>
 
 <script>
-    $(document).ready(function () {
-        var request;
-
-        function getSelectedData() {
-            var selectedAgent = $("#agent").val();
-            var selectedStatus = $("#status").val();
-            var selectedAddress1 = $("#address1").val();
-            var selectedAddress2 = $("#address2").val();
-            var page = $("#page").val();
-            return { page: page, selected_agent: selectedAgent, selected_status: selectedStatus, selected_address1: selectedAddress1, selected_address2: selectedAddress2 };
-        }
-
-        function fetchResults() {
-            if (request && request.readyState !== 4) {
-                request.abort();
-            }
-
-            // Clear the previous results before fetching new ones
-            $("#result").html("");
-
-            // Ajax request for both selected agent and selected status
-            request = $.ajax({
-                type: "POST",
-                url: "search.php", // Use the new search.php file for the AJAX request
-                data: getSelectedData(),
-                success: function (response) {
-                    $("#result").html(response);
-                },
-                error: function (xhr, status, error) {
-                    console.error("Ajax 요청 실패:", error);
-                }
-            });
-        }
-
-        // Additional event handling to trigger AJAX request when the select option is changed
-        $("#page, #agent, #status, #address1, #address2").on("change", function () {
-            // Clear the previous results before fetching new ones
-            $("#result").html("");
-            fetchResults();
-        });
-
-        // Initial AJAX request when the page loads
-        fetchResults();
-    });
-</script>
-
-
-
-
-<script>
 
     var address1Select = document.getElementById("address1");
     var address2Select = document.getElementById("address2");
@@ -241,7 +237,7 @@
     '대전광역시': ['','동구', '중구', '서구', '유성구', '대덕구'],
     '울산광역시': ['','중구', '남구', '동구', '북구', '울주군'],
     '세종특별자치시': ['','세종시'],
-    '경기도': ['','수원시 장안구', '수원시 권선구', '수원시 팔달구', '수원시 영통구', '성남시 수정구', '성남시 중원구', '성남시 분당구', '의정부시', '안양시 만안구', '안양시 동안구', '부천시', '광명시', '평택시', '동두천시', '안산시 상록구', '안산시 단원구', '고양시 덕양구', '고양시 일산동구', '고양시 일산서구', '과천시', '구리시', '남양주시', '오산시', '시흥시', '군포시', '의왕시', '하남시', '용인시 처인구', '용인시 기흥구', '용인시 수지구', '파주시', '이천시', '안성시', '김포시', '화성시', '광주시', '양주시', '포천시', '여주시', '연천군', '가평군', '양평군'],
+    '경기도': ['','수원시 장안구', '수원시 권선구', '수원시 팔달구', '수원시 영통구', '성남시 수정구', '성남시 중원구', '성남시 분당구', '의정부시', '안양시만안구', '안양시동안구', '부천시', '광명시', '평택시', '동두천시', '안산시 상록구', '안산시 단원구', '고양시덕양구', '고양시일산동구', '고양시일산서구', '과천시', '구리시', '남양주시', '오산시', '시흥시', '군포시', '의왕시', '하남시', '용인시 처인구', '용인시 기흥구', '용인시 수지구', '파주시', '이천시', '안성시', '김포시', '화성시', '광주시', '양주시', '포천시', '여주시', '연천군', '가평군', '양평군'],
     '강원특별자치도': ['','춘천시', '원주시', '강릉시', '동해시', '태백시', '속초시', '삼척시', '홍천군', '횡성군', '영월군', '평창군', '정선군', '철원군', '화천군', '양구군', '인제군', '고성군', '양양군'],
     '충청북도': ['','충주시', '제천시', '청주시 상당구', '청주시 서원구', '청주시 흥덕구', '청주시 청원구', '보은군', '옥천군', '영동군', '진천군', '괴산군', '음성군', '단양군', '증평군'],
     '충청남도': ['','천안시 동남구', '천안시 서북구', '공주시', '보령시', '아산시', '서산시', '논산시', '계룡시', '당진시', '금산군', '부여군', '서천군', '청양군', '홍성군', '예산군', '태안군'],
@@ -278,7 +274,6 @@
         }
     }
 </script>
-
 
 
 

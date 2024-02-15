@@ -136,7 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $modalId = 'modal' . $row221['고유키'] ;
             
                 echo '<td>';
-                echo '<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#' . $modalId . '">';
+                echo '<button style="background-color: #fe2b54;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#' . $modalId . '">';
                 echo '기가입';
                 echo '</button>';
                 echo '</td>';
