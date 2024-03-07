@@ -1,6 +1,7 @@
 
 
 <?php
+$searchQuery = $_GET['search'];
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -22,126 +23,56 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $selectedStatus = isset($_POST['selected_status']) ? $_POST['selected_status'] : '';
         $selectedAddress1 = isset($_POST['selected_address1']) ? $_POST['selected_address1'] : '';
         $selectedAddress2 = isset($_POST['selected_address2']) ? $_POST['selected_address2'] : '';
-
+        $selectedDate = isset($_POST['selected_Date']) ? $_POST['selected_Date'] : '';
+        $selectedSearch2 = isset($_POST['selected_Search']) ? $_POST['selected_Search'] : '';
 
         // SQL 쿼리 생성
-        $sql222 = "
-        SELECT 		combined2.num,
-            combined2.업체명,
-            combined2.대표자명,
-            combined2.시도,
-            combined2.시군구,
-            combined2.연락처,
-                combined2.고유키,
-            combined2.담당자,
-            combined2.수신,
-            combined2.회사소개,
-            combined2.상품소개,
-            combined2.결제여부,
-            combined2.관심도,
-            combined2.현상태,
-            combined2.메모,
-                combined2.문자동의,
-            combined2.컨택일,
-                combined2.rn
-        
-        
-        FROM (
-        SELECT 
-            combined.num,
-            combined.업체명,
-            combined.대표자명,
-            combined.시도,
-            combined.시군구,
-            combined.연락처,
-                combined.고유키,
-            combined.담당자,
-            combined.수신,
-            combined.회사소개,
-            combined.상품소개,
-            combined.결제여부,
-            combined.관심도,
-            combined.현상태,
-            combined.메모,
-                combined.문자동의,
-            combined.컨택일,
-                ROW_NUMBER() OVER (PARTITION BY `num` ORDER BY `컨택일` DESC) AS rn
-        FROM (
-            SELECT 
-                customer.`고유키` as num,
-                customer.`중개업소명` as 업체명,
-                customer.`대표자명`,
-                customer.`시` as 시도,
-                customer.`구` as 시군구,
-                customer.`휴대폰번호` as 연락처,
-                        customer.고유키,
-                agent.`담당자`,
-                agent.`수신`,
-                agent.`회사소개`,
-                agent.`상품소개`,
-                agent.`결제여부`,
-                agent.`관심도`,
-                agent.`현상태`,
-                agent.`메모`,
-                agent.`문자동의`,
-                agent.`컨택일`
-            FROM customer
-            LEFT JOIN agent ON customer.고유키 = agent.num 
-                where 수신 <> '문자' AND `수신` <> '실패' AND 구분 <> '유료'
-            UNION ALL
-            SELECT 
-                target.num,
-                target.`업체명`,
-                target.`대표자명`,
-                target.`시도`,
-                target.`시군구`,
-                target.`연락처`,
-                        target.`고유키`,
-                agent.`담당자`,
-                agent.`수신`,
-                agent.`회사소개`,
-                agent.`상품소개`,
-                agent.`결제여부`,
-                agent.`관심도`,
-                agent.`현상태`,
-                agent.`메모`,
-                        agent.`문자동의`,
-                agent.`컨택일`
-            FROM target 
-            LEFT JOIN agent ON target.num = agent.num
-                where 수신 <> '문자' AND `수신` <> '실패'
-        ) AS combined ORDER BY combined.컨택일 DESC
-        )AS combined2
-        where rn = 1
-        AND `문자동의` IN ('O') ";
+        $sql222 = "SELECT A.*, B.*
+        FROM customer A
+        left join (
+            SELECT `업체아이디`, MAX(`edate`) AS max_edate
+            FROM plist
+            GROUP BY `업체아이디`
+        ) B 
+        ON A.고유키 = B.`업체아이디`
+        where 1=1 ";
 
-        if (!empty($selectedAgent)) {
+        if (!empty($selectedAgent) && $selectedAgent !== 'null') {
             $selectedAgent = mysqli_real_escape_string($conn, $selectedAgent);
-            $sql222 .= " AND `담당자` = '$selectedAgent'";
+
+            $퇴사자List = array('퇴사자');
+            if (in_array($selectedAgent, $퇴사자List)) {
+                $sql222 .= " AND (`관리담당자` NOT IN ('윤서현', '이다영', '최효주', '이민성', '김윤석', '홍석환', '이수복') OR `관리담당자` IS NULL)";
+            } else {
+                $sql222 .= " AND `관리담당자` = '$selectedAgent'";
+            }
         }
 
         if (!empty($selectedStatus)) {
             $selectedStatus = mysqli_real_escape_string($conn, $selectedStatus);
-            if ($selectedStatus == 1) {
-                $sql222 .= " AND `현상태` <> '결제성공'";
-            } else {
-                $sql222 .= " AND `현상태` = '$selectedStatus'";
-            }
+            $sql222 .= " AND `구분` = '$selectedStatus'";
         }
-
- 
 
         if (!empty($selectedAddress1)) {
             $selectedAddress1 = mysqli_real_escape_string($conn, $selectedAddress1);
-            $sql222 .= " AND `시도` = '$selectedAddress1'";
+            $sql222 .= " AND `시` = '$selectedAddress1'";
         }
-        
+
         if (!empty($selectedAddress2)) {
             $selectedAddress2 = mysqli_real_escape_string($conn, $selectedAddress2);
-            $sql222 .= " AND `시군구` = '$selectedAddress2'";
+            $sql222 .= " AND `구` = '$selectedAddress2'";
         }
-        
-        $sql222 .= " ORDER BY combined2.컨택일 DESC";
+
+        if (!empty($selectedDate)) {
+            $selectedDate = mysqli_real_escape_string($conn, $selectedDate);
+            $sql222 .= " AND DATE_FORMAT(`컨택일`, '%Y-%m-%d') <= '$selectedDate'";
+        }
+
+        $sql222 .= "AND `테스트계정` <> '테스트' and `관리담당자` <> '샘플' 
+        AND (대표자명 LIKE '%" . mysqli_real_escape_string($conn, $selectedSearch2) . "%' OR
+        중개업소명 LIKE '%" . mysqli_real_escape_string($conn, $selectedSearch2) . "%' OR
+        휴대폰번호 LIKE '%" . mysqli_real_escape_string($conn, $selectedSearch2) . "%')
+        ORDER BY b.max_edate DESC ";
 
         // SQL 쿼리 실행
         $result222 = $conn->query($sql222);
@@ -150,7 +81,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!$result222) {
             die("쿼리 실행 실패: " . $conn->error); // Add error handling to show the query error message
         }
-
 
         // 총 페이지 수 계산
         $itemsPerPage = 20;
@@ -182,47 +112,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo '<table class="table table-bordered table-striped">';
             echo '<thead>';
             echo '<tr>';
-            echo '<th>NUM</th>';
-            echo '<th>업체명</th>';
-            echo '<th>대표자명</th>';
+            
+            echo '<th>고유키</th>';
+            echo '<th>중개업소명</th>';
+
             echo '<th><button id="copyContactsButton">연락처 복사</button></th>';
             echo '<th>주소1</th>';
             echo '<th>주소2</th>';
-            echo '<th>관심도</th>';
-            echo '<th>현상태</th>';
-            echo '<th>메모</th>';
-            echo '<th>문자동의</th>';
-            echo '<th>담당자</th>';
-            echo '<th>컨택일</th>';
-            // Add other column headers as needed
+            echo '<th>구분</th>';
+            echo '<th>매물슬롯</th>';
+            echo '<th>상품종료일</th>';
+            echo '<th>가입일</th>';
+            echo '<th>관리담당자</th>';
             echo '</tr>';
             echo '</thead>';
-
+    
             echo '<script>';
             echo 'var modalId = "";'; 
             echo '</script>';
-
+    
             echo '<tbody>';
             while ($row221 = $result222->fetch_assoc()) {
-                echo '<tr>';
-                $modalId = 'modal' . ($row221['고유키'] ?: $row221['num']);
+                 echo '<tr>';
+                $modalId = 'modal' . $row221['고유키'] ;
             
                 echo '<td>';
-                echo '<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#' . $modalId . '">';
-                echo $row221['고유키'] ? '기가입' : $row221['num'];
+                echo '<button style="background-color: #fe2b54;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#' . $modalId . '">';
+                echo '기가입';
                 echo '</button>';
                 echo '</td>';
-                echo '<td>' . $row221['업체명'] . '</td>';
-                echo '<td>' . $row221['대표자명'] . '</td>';
-                echo '<td data-contact="' . $row221['연락처'] . '">' . $row221['연락처'] . '</td>';
-                echo '<td>' . $row221['시도'] . '</td>';
-                echo '<td>' . $row221['시군구'] . '</td>';
-                echo '<td>' . $row221['관심도'] . '</td>';
-                echo '<td>' . $row221['현상태'] . '</td>';
-                echo '<td>' . (strlen($row221['메모']) > 30 ? substr($row221['메모'], 0, 40) . "..." : $row221['메모']) . '</td>';
-                echo '<td>' . $row221['문자동의'] . '</td>';
-                echo '<td>' . $row221['담당자'] . '</td>';
-                echo '<td>' . $row221['컨택일'] . '</td>';
+                echo '<td>' . $row221['중개업소명'] . ' (<span style="font-size: 13px;">대표자명:' . $row221['대표자명'] . '</span>)</td>';
+                echo '<td data-contact="' . $row221['휴대폰번호'] . '">' . $row221['휴대폰번호'] . '</td>';
+                echo '<td>' . $row221['시'] . '</td>';
+                echo '<td>' . $row221['구'] . '</td>';
+                echo '<td>' . $row221['구분'] . '</td>';
+                echo "<td><span style='color: red;'>".$row221['등록한 매물수']."</span> /".$row221['등록가능 매물수']."</td>";
+                echo '<td>' . $row221['max_edate'] . '</td>';
+                echo '<td>' . $row221['가입일'] . '</td>';
+                //echo '<td>' . (strlen($row221['메모']) > 30 ? substr($row221['메모'], 0, 40) . "..." : $row221['메모']) . '</td>';
+                //echo '<td>' . $row221['문자동의'] . '</td>';
+                echo '<td>' . $row221['관리담당자'] . '</td>';
+                //echo '<td>' . $row221['컨택일'] . '</td>';
+               
                 echo '</tr>';
                 echo '<script>';
             echo 'var modalId = "' . $modalId . '";';
@@ -237,11 +168,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo '<div class="modal-dialog modal-xl">';
             echo '<div class="modal-content" style="width:1500px;">';
             echo '<div class="modal-header">';
-            echo '<h1 class="modal-title fs-5" id="${modalId}Label">Modal title</h1>';
+            echo '<h1 class="modal-title fs-5" id="${modalId}Label">'.$row221['중개업소명'].'/'.$row221['대표자명'].'/'.$row221['고유키']. '</h1>';
             echo '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
             echo '</div>';
             echo '<div class="modal-body" style="height: 800px;" id="${modalId}Content">';
-            echo '<iframe src="' . ($row221['고유키'] ? 'update_customer.php?num=' . urlencode($row221['고유키']) : 'update_target.php?num=' . urlencode($row221['num'])) . '" class="num-link" frameborder="0" width="100%" height="750px"></iframe>';
+            echo '<iframe src="' . 'update_customer copy.php?num=' . urlencode($row221['고유키'])  . '" class="num-link" frameborder="0" width="100%" height="750px"></iframe>';
             echo '</div>';
             echo '<div class="modal-footer">';
             echo '<button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>';
@@ -254,45 +185,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             echo '</tbody>';
             echo '</table>';
-             // 페이지 버튼 생성
-             echo '<div id="pagination">';
-             echo '<nav aria-label="Page navigation example">';
-             echo '<ul class="pagination justify-content-center">';
-             
-             // 이전 페이지 링크 출력
-             if ($pageNumber > 1) {
-                 echo '<li class="page-item"><a class="page-link" href="#" onclick="goToPage('.($pageNumber - 1).')">이전</a></li>';
-             }
-             
-             // 페이지 번호 출력
-             $startPage = max(1, min($pageNumber - 10, $totalPages - 19));
-             $endPage = min($startPage + 19, $totalPages);
-             for ($i = $startPage; $i <= $endPage; $i++) {
-                 $class = ($i == $pageNumber) ? 'active' : '';
-                 echo '<li class="page-item '.$class.'"><a class="page-link" href="#" onclick="goToPage('.$i.')">'.$i.'</a></li>';
-             }
-             
-             // 다음 페이지 링크 출력
-             if ($pageNumber < $totalPages) {
-                 echo '<li class="page-item"><a class="page-link" href="#" onclick="goToPage('.($pageNumber + 1).')">다음</a></li>';
-             }
-             
-             echo '</ul>';
-             echo '</nav>';
-             
- echo '</div>';
+            // 페이지 버튼 생성
+            echo '<div id="pagination">';
+            echo '<nav aria-label="Page navigation example">';
+            echo '<ul class="pagination justify-content-center">';
+            
+            // 이전 페이지 링크 출력
+            if ($pageNumber > 1) {
+                echo '<li class="page-item"><a class="page-link" href="#" onclick="goToPage('.($pageNumber - 1).')">이전</a></li>';
+            }
+            
+            // 페이지 번호 출력
+            $startPage = max(1, min($pageNumber - 10, $totalPages - 19));
+            $endPage = min($startPage + 19, $totalPages);
+            for ($i = $startPage; $i <= $endPage; $i++) {
+                $class = ($i == $pageNumber) ? 'active' : '';
+                echo '<li class="page-item '.$class.'"><a class="page-link" href="#" onclick="goToPage('.$i.')">'.$i.'</a></li>';
+            }
+            
+            // 다음 페이지 링크 출력
+            if ($pageNumber < $totalPages) {
+                echo '<li class="page-item"><a class="page-link" href="#" onclick="goToPage('.($pageNumber + 1).')">다음</a></li>';
+            }
+            
+            echo '</ul>';
+            echo '</nav>';
+            
+echo '</div>';
         } else {
             echo "결과가 없습니다.";
         }
-
         $conn->close();
-    } else {
+    }
+    else {
         echo "선택한 담당자가 없습니다.";
     }
 }}
 ?>
- 
-
  <script>
     // 총 페이지 수 계산
     var totalPages = <?php echo $totalPages; ?>;
@@ -323,7 +252,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $.ajax({
             type: "POST",
-            url: "search.php",
+            url: "admin_customer copy.php",
             data: {
                 page: page,
                 selected_agent: selectedAgent,
@@ -350,7 +279,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     getPageData(page);
 }
 </script>
-
 
  <script>
 

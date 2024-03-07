@@ -115,11 +115,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             echo '<th>고유키</th>';
             echo '<th>중개업소명</th>';
-            echo '<th>대표자명</th>';
+
             echo '<th><button id="copyContactsButton">연락처 복사</button></th>';
             echo '<th>주소1</th>';
             echo '<th>주소2</th>';
             echo '<th>구분</th>';
+            echo '<th>매물슬롯</th>';
             echo '<th>상품종료일</th>';
             echo '<th>가입일</th>';
             echo '<th>관리담당자</th>';
@@ -140,12 +141,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo '기가입';
                 echo '</button>';
                 echo '</td>';
-                echo '<td>' . $row221['중개업소명'] . '</td>';
-                echo '<td>' . $row221['대표자명'] . '</td>';
+                echo '<td>' . $row221['중개업소명'] . ' (<span style="font-size: 13px;">대표자명:' . $row221['대표자명'] . '</span>)</td>';
                 echo '<td data-contact="' . $row221['휴대폰번호'] . '">' . $row221['휴대폰번호'] . '</td>';
                 echo '<td>' . $row221['시'] . '</td>';
                 echo '<td>' . $row221['구'] . '</td>';
                 echo '<td>' . $row221['구분'] . '</td>';
+                echo "<td><span style='color: red;'>".$row221['등록한 매물수']."</span> /".$row221['등록가능 매물수']."</td>";
                 echo '<td>' . $row221['max_edate'] . '</td>';
                 echo '<td>' . $row221['가입일'] . '</td>';
                 //echo '<td>' . (strlen($row221['메모']) > 30 ? substr($row221['메모'], 0, 40) . "..." : $row221['메모']) . '</td>';
@@ -167,7 +168,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo '<div class="modal-dialog modal-xl">';
             echo '<div class="modal-content" style="width:1500px;">';
             echo '<div class="modal-header">';
-            echo '<h1 class="modal-title fs-5" id="${modalId}Label">Modal title</h1>';
+            echo '<h1 class="modal-title fs-5" id="${modalId}Label">'.$row221['중개업소명'].'/'.$row221['대표자명'].'/'.$row221['고유키']. '</h1>';
             echo '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
             echo '</div>';
             echo '<div class="modal-body" style="height: 800px;" id="${modalId}Content">';

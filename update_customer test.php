@@ -15,8 +15,7 @@ th, td {
 }
 
 th {
-  background-color: #fe2b54;
-
+  background-color: #f2f2f2;
 }
 
 /* 추가된 스타일 */
@@ -70,7 +69,6 @@ th {
   
 }
 
-
 /* Style the left button */
 .tab button.left {
   flex: 1; /* 왼쪽 버튼이 컨테이너의 50%를 차지하도록 설정합니다. */
@@ -94,7 +92,7 @@ th {
   outline: none; /* 포커스시 테두리 제거 */
   cursor: pointer; /* 커서 모양 변경 */
   padding: 10px 20px; /* 안쪽 여백 설정 */
-  transition: background-color 0.6s; /* 배경색 전환에 대한 전이 효과 */
+  transition: background-color 0.3s; /* 배경색 전환에 대한 전이 효과 */
   font-size: 16px; /* 글꼴 크기 설정 */
   font-weight: bold; /* 글꼴 굵기 설정 */
 }
@@ -102,53 +100,7 @@ th {
 /* Change background color of buttons on hover */
 .tab button:hover {
   background-color: #fe2b54; /* 호버 상태일 때 배경색 변경 */
-  color: white; /* 호버 상태일 때 폰트 색상 변경 */
 }
-
-
-
-.tab2 {
-  display: flex; /* 탭 버튼을 가로로 정렬합니다. */
-  overflow: hidden; /* 버튼의 내용이 넘칠 경우 숨깁니다. */
-  
-}
-
-
-/* Style the left button */
-.tab2 button.left {
-  flex: 1; /* 왼쪽 버튼이 컨테이너의 50%를 차지하도록 설정합니다. */
-  border-top-right-radius: 0; /* 오른쪽 상단 모서리를 둥글게 만듭니다. */
-  border-bottom-right-radius: 0; /* 오른쪽 하단 모서리를 둥글게 만듭니다. */
-
-}
-
-/* Style the right button */
-.tab2 button.right {
-  flex: 1; /* 오른쪽 버튼이 컨테이너의 50%를 차지하도록 설정합니다. */
-  border-top-left-radius: 0; /* 왼쪽 상단 모서리를 둥글게 만듭니다. */
-  border-bottom-left-radius: 0; /* 왼쪽 하단 모서리를 둥글게 만듭니다. */
-
-}
-
-/* Style the buttons */
-.tab2 button {
-  background-color: #f2f2f2; /* 배경색 */
-  border: none; /* 테두리 제거 */
-  outline: none; /* 포커스시 테두리 제거 */
-  cursor: pointer; /* 커서 모양 변경 */
-  padding: 10px 20px; /* 안쪽 여백 설정 */
-  transition: background-color 0.6s; /* 배경색 전환에 대한 전이 효과 */
-  font-size: 16px; /* 글꼴 크기 설정 */
-  font-weight: bold; /* 글꼴 굵기 설정 */
-}
-
-/* Change background color of buttons on hover */
-.tab2 button:hover {
-  background-color: #fe2b54; /* 호버 상태일 때 배경색 변경 */
-  color: white; /* 호버 상태일 때 폰트 색상 변경 */
-}
-
-
 
 
 
@@ -257,7 +209,7 @@ table {
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   
 
 
@@ -300,7 +252,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql2234 = "INSERT INTO agent(num, 담당자, 수신, 회사소개, 상품소개, 결제여부, 컨택일, 관심도, 현상태, 메모, 문자동의, voc1, voc2) 
     VALUES ('$num', '$agent', '$receive', '$introduction', '$pduction', '$pstatus', '$currentDateTime', '$interest', '$cstate', '$memo', '$amessage', '$voc1', '$voc2')";
   if ($conn->query($sql2234) === TRUE) {
-    #echo "<script>alert('버튼2 등록이완료되었습니다.');</script>";
+    echo "<script>alert('버튼2 등록이완료되었습니다.');</script>";
     header("Location: " . $targetUrl);
     
 } else {
@@ -330,16 +282,8 @@ $row2 = $result2->fetch_assoc();
 $sql3 = "SELECT * FROM target WHERE 고유키 = '$num'";
 $result3 = $conn->query($sql3);
 $row3 = $result3->fetch_assoc();
-
 ?>
 <div style='width: 100%; margin: 0 auto;'>
-
-
-
-<div class="tab2">
-  <button class="left tablinks2" onclick="openTab2(event, 'tab3')" id="defaultOpen2">기본정보</button>
-  <button class="right tablinks2" onclick="openTab2(event, 'tab4')">효과측정 DATA</button>
-</div>
 
 
 <?php
@@ -354,18 +298,12 @@ if ($result->num_rows > 0) {
       $currentStatus = $row['구분'];
       $currentExpire = $row2['max_edate'];
       $currentjoindate = $row2['가입일'];
-      $slot_all = $row2['등록가능 매물수'];
-      $slot_activated = $row2['등록한 매물수'];
   }
   
-
-  echo "<div id='tab3' class='tabcontent2'>";
-  echo "<div style='width: 100%;'>";
-  echo "<table class='table'>";
-  echo "<div style='width: 100%;'>";
   echo "<table style='width: 100%;'>";
-  echo "<tr><th>업체명11</th><th>대표자명</th><th>휴대폰번호</th><th>유선번호</th><th>연락처</th><th>시도</th><th>시군구</th><th>유/무료</th><th>상품종료일</th><th>가입일</th><th>매물슬롯</th></tr>";
+  echo "<tr><th>num</th><th>업체명</th><th>대표자명</th><th>연락처1Admin</th><th>연락처2Admin</th><th>연락처</th><th>시도</th><th>시군구</th><th>유/무료</th><th>상품종료일</th><th>가입일</th></tr>";
   echo "<tr>";
+  echo "<td>$num</td>";
   echo "<td>$currentCompanyName</td>";
   echo "<td>$currentCEOName</td>";
   echo "<td>$currentContact</td>";
@@ -390,122 +328,15 @@ if ($result->num_rows > 0) {
   echo "<td>$currentStatus</td>";
   echo "<td>$currentExpire</td>";
   echo "<td>$currentjoindate</td>";
-  echo "<td><span style='color: red;'>$slot_activated </span> / $slot_all</td>";
   echo "</tr>";
-
-
-
-
-
   echo "</table>";
-
-
-
-
-
-
 } else {
   echo "No data found.";
 }
 
-?>
-</div>
-<?php
-
-$sql = "SELECT * FROM customer WHERE 고유키 = '$num'";
-$result = $conn->query($sql);
-
-
-
-if ($result->num_rows == 1) {
-  while ($row5 = $result->fetch_assoc()) {
-      $callCompanyName = $row5['중개업소명'];
-      $callCEOName = $row5['대표자명'];
-$sql4 = "SELECT 
-            Year,
-            Month,
-            네모콜,
-            네모SMS,
-            직방,
-            네모콜 + 네모SMS + 직방 AS '합',
-            (네모콜 + 네모SMS + 직방) - LAG((네모콜 + 네모SMS + 직방), 1, 0) OVER (ORDER BY Year ASC, Month ASC)  AS '등락'
-        FROM (
-            SELECT 
-                YEAR(요청일) AS Year,
-                MONTH(요청일) AS Month,
-                SUM(IF(분류 = '네모콜', 1, 0)) AS '네모콜',
-                SUM(IF(분류 = '네모SMS', 1, 0)) AS '네모SMS',
-                SUM(IF(분류 = '직방', 1, 0)) AS '직방'
-            FROM (
-                (SELECT `중개업소아이디`, `중개업소명`,  `통화시작` as `요청일`, '네모콜' as 분류
-                FROM call_list
-                WHERE `중개업소아이디` = '$num')
-                
-                UNION ALL
-                
-                (SELECT `아이디` as `중개업소아이디`, `중개업소명`, `요청일`, '네모SMS' as 분류
-                FROM sms_list
-                WHERE `중개업소명` = '$callCompanyName' and `대표자명` = '$callCEOName')
-                
-                UNION ALL
-                
-                (SELECT `업체고유키` as `중개업소아이디`, `중개업소명`, `요청일`, '직방' as 분류
-                FROM zig_sms
-                WHERE `업체고유키` = '$num')
-            ) AS combine_call
-            GROUP BY 
-                YEAR(요청일), MONTH(요청일)
-        ) AS subquery
-        ORDER BY 
-            Year DESC, Month DESC";
-$result4 = $conn->query($sql4);
-// $row4 = $result4->fetch_assoc();
-            }
-          }
-?>
-
-
-<?php
-
-if ($result4->num_rows > 0) {
-  echo "<div id='tab4' class='tabcontent3' style='display:none;'>"; // tab4의 클래스를 tabcontent3로 변경
-  echo "<div style='width: 100%;'>";
-  echo "<table style='width: 100%;'>";
-  echo "<tr><th>날짜</th><th>네모콜</th><th>네모SMS</th><th>직방유입</th><th>합</th><th>등락</th></tr>";
-
-  while ($row4 = $result4->fetch_assoc()) {
-      $callYear = $row4['Year'];
-      $callMonth = $row4['Month'];
-      $callNemo = $row4['네모콜'];
-      $callSms = $row4['네모SMS'];
-      $callZig = $row4['직방'];
-      $callTotal = $row4['합'];
-      $callChange = $row4['등락'];
-
-      echo "<tr>";
-      echo "<td>$callYear 년 $callMonth 월</td>";
-      echo "<td>$callNemo</td>";
-      echo "<td>$callSms</td>";
-      echo "<td>$callZig</td>";
-      echo "<td>$callTotal</td>";
-      // echo "<td>$callChange</td>";
-      if ($callChange > 0) {
-        echo "<td><span style='color: red;'>$callChange</span></td>"; // 양수인 경우 빨간색으로 출력
-    } elseif ($callChange < 0) {
-        echo "<td><span style='color: blue;'>$callChange</span></td>"; // 음수인 경우 파란색으로 출력
-    } else {
-        echo "<td>$callChange</td>"; // 0인 경우에는 별도의 색상을 적용하지 않고 출력
-    }
-      echo "</tr>";
-  }
-  echo "</table>";
-  echo "</div></div>";
-} else {
-  echo "<span style='color: red;'>CALL DATA NOT FOUND.</span>";
-}
-
 $conn->close();
 ?>
+</div>
 
 
 <div style="width: 100%;">
@@ -598,18 +429,18 @@ $conn->close();
         </div>
            </form>
   </div>
-  </div>
-  </div></br>
+
 
 
 <!-- Tab buttons -->
 <div class="tab">
-<button class="left tablinks1" onclick="openTab1(event, 'tab1')" id="defaultOpen1">히스토리</button>
-  <button class="right tablinks1" onclick="openTab1(event, 'tab2')">상품리스트</button>
+  <button class="left" onclick="openTab(event, 'tab1')" id="defaultOpen">히스토리</button>
+  
+<button class="right" onclick="openTab(event, 'tab2')">상품리스트</button>
 </div>
 
 <!-- Tab content -->
-<div id="tab1" class="tabcontent1">
+<div id="tab1" class="tabcontent">
   <div style="width: 100%;">
     <table class="table">
     <div style="width: 100%;">
@@ -641,7 +472,7 @@ $conn->close();
   </div>
 </div>
 
-<div id="tab2" class="tabcontent1">
+<div id="tab2" class="tabcontent">
   <div style="width: 100%;">
   <table class="table">
           <thead>
@@ -673,59 +504,37 @@ $conn->close();
 </div>
 
 <script>
-// Function to open tab content for the first set of tabs
-function openTab1(evt, tabName) {
+// Function to open tab content
+function openTab(evt, tabName) {
   var i, tabcontent, tablinks;
 
-  // Hide all tab content for the first set of tabs
-  tabcontent = document.getElementsByClassName("tabcontent1");
+  // Hide all tab content
+  tabcontent = document.getElementsByClassName("tabcontent");
   for (i = 0; i < tabcontent.length; i++) {
     tabcontent[i].style.display = "none";
   }
 
-  // Remove "active" class from all tab buttons for the first set of tabs
-  tablinks = document.getElementsByClassName("tablinks1");
+  // Remove "active" class from all tab buttons
+  tablinks = document.getElementsByClassName("tablinks");
   for (i = 0; i < tablinks.length; i++) {
     tablinks[i].className = tablinks[i].className.replace(" active", "");
   }
 
-  // Show the specific tab content for the first set of tabs
+  // Show the specific tab content
   document.getElementById(tabName).style.display = "block";
 
-  // Add the "active" class to the button that opened the tab for the first set of tabs
+  // Add the "active" class to the button that opened the tab
   evt.currentTarget.className += " active";
 }
 
-// Function to open tab content for the second set of tabs
-function openTab2(evt, tabName) {
-  var i, tabcontent, tablinks;
-
-  // Hide all tab content for the second set of tabs
-  tabcontent = document.getElementsByClassName("tabcontent3");
-  for (i = 0; i < tabcontent.length; i++) {
-    tabcontent[i].style.display = "none";
-  }
-
-  // Remove "active" class from all tab buttons for the second set of tabs
-  tablinks = document.getElementsByClassName("tablinks2");
-  for (i = 0; i < tablinks.length; i++) {
-    tablinks[i].className = tablinks[i].className.replace(" active", "");
-  }
-
-  // Show the specific tab content for the second set of tabs
-  document.getElementById(tabName).style.display = "block";
-
-  // Add the "active" class to the button that opened the tab for the second set of tabs
-  evt.currentTarget.className += " active";
-}
-
-// Open the default tab for the first set of tabs on page load
-document.getElementById("defaultOpen1").click();
-
-// Open the default tab for the second set of tabs on page load
-document.getElementById("defaultOpen2").click();
-
+// Open the default tab on page load
+document.getElementById("defaultOpen").click();
 </script>
+
+
+
+
+
 
       
 
@@ -926,9 +735,9 @@ typeCell.appendChild(typeLabel);
 
     const address2Options = {
         '일반문의': ['매물관리', '플랫폼문의', '계정관리'],
-        '상품문의': ['연장결제','추가/변경', '환불'],
+        '상품문의': ['추가/변경', '환불'],
         '컴플레인': ['네모인', '효과미미', '오류', '마케팅'],
-        '해피콜': ['연장안내','매물등록독려', '프로모션안내', '검수관련']
+        '해피콜': ['매물등록독려', '프로모션안내', '검수관련']
     };
 
     address1Select.addEventListener("change", function () {

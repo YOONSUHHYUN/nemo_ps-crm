@@ -331,6 +331,46 @@ $sql3 = "SELECT * FROM target WHERE 고유키 = '$num'";
 $result3 = $conn->query($sql3);
 $row3 = $result3->fetch_assoc();
 
+
+$sql4 = "SELECT 
+            Year,
+            Month,
+            네모콜,
+            네모SMS,
+            직방,
+            네모콜 + 네모SMS + 직방 AS '합',
+            (네모콜 + 네모SMS + 직방) - LAG((네모콜 + 네모SMS + 직방), 1, 0) OVER (ORDER BY Year ASC, Month ASC)  AS '등락'
+        FROM (
+            SELECT 
+                YEAR(요청일) AS Year,
+                MONTH(요청일) AS Month,
+                SUM(IF(분류 = '네모콜', 1, 0)) AS '네모콜',
+                SUM(IF(분류 = '네모SMS', 1, 0)) AS '네모SMS',
+                SUM(IF(분류 = '직방', 1, 0)) AS '직방'
+            FROM (
+                (SELECT `중개업소아이디`, `중개업소명`,  `통화시작` as `요청일`, '네모콜' as 분류
+                FROM call_list
+                WHERE `중개업소아이디` = '8d7852b5-3698-4f48-90b2-3e0ce8f9ca88')
+                
+                UNION ALL
+                
+                (SELECT `아이디` as `중개업소아이디`, `중개업소명`, `요청일`, '네모SMS' as 분류
+                FROM sms_list
+                WHERE `중개업소명` = '커피한잔공인중개사사무소' and `대표자명` = '손별')
+                
+                UNION ALL
+                
+                (SELECT `업체고유키` as `중개업소아이디`, `중개업소명`, `요청일`, '직방' as 분류
+                FROM zig_sms
+                WHERE `업체고유키` = '8d7852b5-3698-4f48-90b2-3e0ce8f9ca88')
+            ) AS combine_call
+            GROUP BY 
+                YEAR(요청일), MONTH(요청일)
+        ) AS subquery
+        ORDER BY 
+            Year DESC, Month DESC";
+$result4 = $conn->query($sql4);
+$row4 = $result4->fetch_assoc();
 ?>
 <div style='width: 100%; margin: 0 auto;'>
 
@@ -364,7 +404,7 @@ if ($result->num_rows > 0) {
   echo "<table class='table'>";
   echo "<div style='width: 100%;'>";
   echo "<table style='width: 100%;'>";
-  echo "<tr><th>업체명11</th><th>대표자명</th><th>휴대폰번호</th><th>유선번호</th><th>연락처</th><th>시도</th><th>시군구</th><th>유/무료</th><th>상품종료일</th><th>가입일</th><th>매물슬롯</th></tr>";
+  echo "<tr><th>업체명22</th><th>대표자명</th><th>휴대폰번호</th><th>유선번호</th><th>연락처</th><th>시도</th><th>시군구</th><th>유/무료</th><th>상품종료일</th><th>가입일</th><th>매물슬롯</th></tr>";
   echo "<tr>";
   echo "<td>$currentCompanyName</td>";
   echo "<td>$currentCEOName</td>";
@@ -398,73 +438,13 @@ if ($result->num_rows > 0) {
 
 
   echo "</table>";
-
-
-
-
-
-
 } else {
   echo "No data found.";
 }
 
+// $conn->close();
 ?>
 </div>
-<?php
-
-$sql = "SELECT * FROM customer WHERE 고유키 = '$num'";
-$result = $conn->query($sql);
-
-
-
-if ($result->num_rows == 1) {
-  while ($row5 = $result->fetch_assoc()) {
-      $callCompanyName = $row5['중개업소명'];
-      $callCEOName = $row5['대표자명'];
-$sql4 = "SELECT 
-            Year,
-            Month,
-            네모콜,
-            네모SMS,
-            직방,
-            네모콜 + 네모SMS + 직방 AS '합',
-            (네모콜 + 네모SMS + 직방) - LAG((네모콜 + 네모SMS + 직방), 1, 0) OVER (ORDER BY Year ASC, Month ASC)  AS '등락'
-        FROM (
-            SELECT 
-                YEAR(요청일) AS Year,
-                MONTH(요청일) AS Month,
-                SUM(IF(분류 = '네모콜', 1, 0)) AS '네모콜',
-                SUM(IF(분류 = '네모SMS', 1, 0)) AS '네모SMS',
-                SUM(IF(분류 = '직방', 1, 0)) AS '직방'
-            FROM (
-                (SELECT `중개업소아이디`, `중개업소명`,  `통화시작` as `요청일`, '네모콜' as 분류
-                FROM call_list
-                WHERE `중개업소아이디` = '$num')
-                
-                UNION ALL
-                
-                (SELECT `아이디` as `중개업소아이디`, `중개업소명`, `요청일`, '네모SMS' as 분류
-                FROM sms_list
-                WHERE `중개업소명` = '$callCompanyName' and `대표자명` = '$callCEOName')
-                
-                UNION ALL
-                
-                (SELECT `업체고유키` as `중개업소아이디`, `중개업소명`, `요청일`, '직방' as 분류
-                FROM zig_sms
-                WHERE `업체고유키` = '$num')
-            ) AS combine_call
-            GROUP BY 
-                YEAR(요청일), MONTH(요청일)
-        ) AS subquery
-        ORDER BY 
-            Year DESC, Month DESC";
-$result4 = $conn->query($sql4);
-// $row4 = $result4->fetch_assoc();
-            }
-          }
-?>
-
-
 <?php
 
 if ($result4->num_rows > 0) {
@@ -483,25 +463,18 @@ if ($result4->num_rows > 0) {
       $callChange = $row4['등락'];
 
       echo "<tr>";
-      echo "<td>$callYear 년 $callMonth 월</td>";
+      echo "<td>$callYear-$callMonth</td>";
       echo "<td>$callNemo</td>";
       echo "<td>$callSms</td>";
       echo "<td>$callZig</td>";
       echo "<td>$callTotal</td>";
-      // echo "<td>$callChange</td>";
-      if ($callChange > 0) {
-        echo "<td><span style='color: red;'>$callChange</span></td>"; // 양수인 경우 빨간색으로 출력
-    } elseif ($callChange < 0) {
-        echo "<td><span style='color: blue;'>$callChange</span></td>"; // 음수인 경우 파란색으로 출력
-    } else {
-        echo "<td>$callChange</td>"; // 0인 경우에는 별도의 색상을 적용하지 않고 출력
-    }
+      echo "<td>$callChange</td>";
       echo "</tr>";
   }
   echo "</table>";
   echo "</div></div>";
 } else {
-  echo "<span style='color: red;'>CALL DATA NOT FOUND.</span>";
+  echo "No data found.";
 }
 
 $conn->close();

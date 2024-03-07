@@ -54,7 +54,7 @@
   <div class="container-fluid border-bottom" style="height:70px;">
   <a href="main.php">
   <img width="100px" src="logo.png" class="rounded float-start"></a>
-  <a>CRM.. beta version 1.1 / 2024-03-07</a>
+  <a>CRM.. beta version 1.1 / 2024-02-06</a>
   <center><h1 class="red">Platform Sales</h1></center>
   </div>
 
