@@ -337,7 +337,7 @@ $row3 = $result3->fetch_assoc();
 
 
 <div class="tab2">
-  <button class="left tablinks2" onclick="openTab2(event, 'tab3')" >기본정보</button>
+  <button class="left tablinks2" onclick="openTab2(event, 'tab3')" id="defaultOpen2">기본정보</button>
   <button class="right tablinks2" onclick="openTab2(event, 'tab4')">효과측정 DATA</button>
 </div>
 
@@ -359,12 +359,12 @@ if ($result->num_rows > 0) {
   }
   
 
-  echo "<div id='tab3' class='tabcontent2' >";
+  echo "<div id='tab3' class='tabcontent2'>";
   echo "<div style='width: 100%;'>";
   echo "<table class='table'>";
   echo "<div style='width: 100%;'>";
   echo "<table style='width: 100%;'>";
-  echo "<tr><th>업체명22</th><th>대표자명</th><th>휴대폰번호</th><th>유선번호</th><th>연락처</th><th>시도</th><th>시군구</th><th>유/무료</th><th>상품종료일</th><th>가입일</th><th>매물슬롯</th></tr>";
+  echo "<tr><th>업체명11</th><th>대표자명</th><th>휴대폰번호</th><th>유선번호</th><th>연락처</th><th>시도</th><th>시군구</th><th>유/무료</th><th>상품종료일</th><th>가입일</th><th>매물슬롯</th></tr>";
   echo "<tr>";
   echo "<td>$currentCompanyName</td>";
   echo "<td>$currentCEOName</td>";
@@ -408,6 +408,103 @@ if ($result->num_rows > 0) {
   echo "No data found.";
 }
 
+?>
+</div>
+<?php
+
+$sql = "SELECT * FROM customer WHERE 고유키 = '$num'";
+$result = $conn->query($sql);
+
+
+
+if ($result->num_rows == 1) {
+  while ($row5 = $result->fetch_assoc()) {
+      $callCompanyName = $row5['중개업소명'];
+      $callCEOName = $row5['대표자명'];
+$sql4 = "SELECT 
+            Year,
+            Month,
+            네모콜,
+            네모SMS,
+            직방,
+            네모콜 + 네모SMS + 직방 AS '합',
+            (네모콜 + 네모SMS + 직방) - LAG((네모콜 + 네모SMS + 직방), 1, 0) OVER (ORDER BY Year ASC, Month ASC)  AS '등락'
+        FROM (
+            SELECT 
+                YEAR(요청일) AS Year,
+                MONTH(요청일) AS Month,
+                SUM(IF(분류 = '네모콜', 1, 0)) AS '네모콜',
+                SUM(IF(분류 = '네모SMS', 1, 0)) AS '네모SMS',
+                SUM(IF(분류 = '직방', 1, 0)) AS '직방'
+            FROM (
+                (SELECT `중개업소아이디`, `중개업소명`,  `통화시작` as `요청일`, '네모콜' as 분류
+                FROM call_list
+                WHERE `중개업소아이디` = '$num')
+                
+                UNION ALL
+                
+                (SELECT `아이디` as `중개업소아이디`, `중개업소명`, `요청일`, '네모SMS' as 분류
+                FROM sms_list
+                WHERE `중개업소명` = '$callCompanyName' and `대표자명` = '$callCEOName')
+                
+                UNION ALL
+                
+                (SELECT `업체고유키` as `중개업소아이디`, `중개업소명`, `요청일`, '직방' as 분류
+                FROM zig_sms
+                WHERE `업체고유키` = '$num')
+            ) AS combine_call
+            GROUP BY 
+                YEAR(요청일), MONTH(요청일)
+        ) AS subquery
+        ORDER BY 
+            Year DESC, Month DESC";
+$result4 = $conn->query($sql4);
+// $row4 = $result4->fetch_assoc();
+            }
+          }
+?>
+
+
+<?php
+
+if ($result4->num_rows > 0) {
+  echo "<div id='tab4' class='tabcontent3' style='display:none;'>"; // tab4의 클래스를 tabcontent3로 변경
+  echo "<div style='width: 100%;'>";
+  echo "<table style='width: 100%;'>";
+  echo "<tr><th>날짜</th><th>네모콜</th><th>네모SMS</th><th>직방유입</th><th>합</th><th>등락</th></tr>";
+
+  while ($row4 = $result4->fetch_assoc()) {
+      $callYear = $row4['Year'];
+      $callMonth = $row4['Month'];
+      $callNemo = $row4['네모콜'];
+      $callSms = $row4['네모SMS'];
+      $callZig = $row4['직방'];
+      $callTotal = $row4['합'];
+      $callChange = $row4['등락'];
+
+      echo "<tr>";
+      echo "<td>$callYear 년 $callMonth 월</td>";
+      echo "<td>$callNemo</td>";
+      echo "<td>$callSms</td>";
+      echo "<td>$callZig</td>";
+      echo "<td>$callTotal</td>";
+      // echo "<td>$callChange</td>";
+      if ($callChange > 0) {
+        echo "<td><span style='color: red;'>$callChange</span></td>"; // 양수인 경우 빨간색으로 출력
+    } elseif ($callChange < 0) {
+        echo "<td><span style='color: blue;'>$callChange</span></td>"; // 음수인 경우 파란색으로 출력
+    } else {
+        echo "<td>$callChange</td>"; // 0인 경우에는 별도의 색상을 적용하지 않고 출력
+    }
+      echo "</tr>";
+  }
+  echo "</table>";
+  echo "</div></div>";
+} else {
+  echo "<span style='color: red;'>CALL DATA NOT FOUND.</span>";
+}
+
+$conn->close();
 ?>
 
 
@@ -503,110 +600,6 @@ if ($result->num_rows > 0) {
   </div>
   </div>
   </div></br>
-
-
-
-
-
-</div>
-<?php
-
-$sql = "SELECT * FROM customer WHERE 고유키 = '$num'";
-$result = $conn->query($sql);
-
-
-
-if ($result->num_rows == 1) {
-  while ($row5 = $result->fetch_assoc()) {
-      $callCompanyName = $row5['중개업소명'];
-      $callCEOName = $row5['대표자명'];
-$sql4 = "SELECT 
-            Year,
-            Month,
-            네모콜,
-            네모SMS,
-            직방,
-            네모콜 + 네모SMS + 직방 AS '합',
-            (네모콜 + 네모SMS + 직방) - LAG((네모콜 + 네모SMS + 직방), 1, 0) OVER (ORDER BY Year ASC, Month ASC)  AS '등락'
-        FROM (
-            SELECT 
-                YEAR(요청일) AS Year,
-                MONTH(요청일) AS Month,
-                SUM(IF(분류 = '네모콜', 1, 0)) AS '네모콜',
-                SUM(IF(분류 = '네모SMS', 1, 0)) AS '네모SMS',
-                SUM(IF(분류 = '직방', 1, 0)) AS '직방'
-            FROM (
-                (SELECT `중개업소아이디`, `중개업소명`,  `통화시작` as `요청일`, '네모콜' as 분류
-                FROM call_list
-                WHERE `중개업소아이디` = '$num')
-                
-                UNION ALL
-                
-                (SELECT `아이디` as `중개업소아이디`, `중개업소명`, `요청일`, '네모SMS' as 분류
-                FROM sms_list
-                WHERE `중개업소명` = '$callCompanyName' and `대표자명` = '$callCEOName')
-                
-                UNION ALL
-                
-                (SELECT `업체고유키` as `중개업소아이디`, `중개업소명`, `요청일`, '직방' as 분류
-                FROM zig_sms
-                WHERE `업체고유키` = '$num')
-            ) AS combine_call
-            GROUP BY 
-                YEAR(요청일), MONTH(요청일)
-        ) AS subquery
-        ORDER BY 
-            Year DESC, Month DESC";
-$result4 = $conn->query($sql4);
-// $row4 = $result4->fetch_assoc();
-            }
-          }
-?>
-
-
-<?php
-
-if ($result4->num_rows > 0) {
-  echo "<div id='tab4' class='tabcontent2' style='display:none;'>"; // tab4의 클래스를 tabcontent3로 변경
-  echo "<div style='width: 100%;'>";
-  echo "<table style='width: 100%;'>";
-  echo "<tr><th>날짜</th><th>네모콜</th><th>네모SMS</th><th>직방유입</th><th>합</th><th>등락</th></tr>";
-
-  while ($row4 = $result4->fetch_assoc()) {
-      $callYear = $row4['Year'];
-      $callMonth = $row4['Month'];
-      $callNemo = $row4['네모콜'];
-      $callSms = $row4['네모SMS'];
-      $callZig = $row4['직방'];
-      $callTotal = $row4['합'];
-      $callChange = $row4['등락'];
-
-      echo "<tr>";
-      echo "<td>$callYear 년 $callMonth 월</td>";
-      echo "<td>$callNemo</td>";
-      echo "<td>$callSms</td>";
-      echo "<td>$callZig</td>";
-      echo "<td>$callTotal</td>";
-      // echo "<td>$callChange</td>";
-      if ($callChange > 0) {
-        echo "<td><span style='color: red;'>$callChange</span></td>"; // 양수인 경우 빨간색으로 출력
-    } elseif ($callChange < 0) {
-        echo "<td><span style='color: blue;'>$callChange</span></td>"; // 음수인 경우 파란색으로 출력
-    } else {
-        echo "<td>$callChange</td>"; // 0인 경우에는 별도의 색상을 적용하지 않고 출력
-    }
-      echo "</tr>";
-  }
-  echo "</table>";
-  echo "</div></div></div>";
-} else {
-  echo "<span style='color: red;'>CALL DATA NOT FOUND.</span>";
-}
-
-$conn->close();
-?>
-
-
 
 
 <!-- Tab buttons -->
@@ -708,7 +701,7 @@ function openTab2(evt, tabName) {
   var i, tabcontent, tablinks;
 
   // Hide all tab content for the second set of tabs
-  tabcontent = document.getElementsByClassName("tabcontent2");
+  tabcontent = document.getElementsByClassName("tabcontent3");
   for (i = 0; i < tabcontent.length; i++) {
     tabcontent[i].style.display = "none";
   }

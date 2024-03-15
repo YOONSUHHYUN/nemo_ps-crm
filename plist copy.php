@@ -117,7 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $modalId = 'modal' . $row221['업체아이디'];
 
                     // 현재 그룹과 이전 그룹, 중개업소명/대표자명이 같지 않은 경우에만 출력
-                    if ($row221['그룹'] != $prevGroup || $row221['업체명'] . ' / ' . $row221['대표자명'] != $prevCompany) {
+                    if ($row221['그룹'] != $prevGroup || $row221['업체명'] . '/' . $row221['대표자명'] != $prevCompany) {
                         echo '<td style="border-top: 2px solid #ddd;">' . $row221['그룹'] . '</td>';
                         echo '<td style="border-top: 2px solid #ddd;">';
                         echo '<button style="background-color: #fe2b54;" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#' . $modalId . '">';
@@ -155,10 +155,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         echo '<span class="label label-warning">사무실+상가</span>';
                     }
 
-                    echo ' ' . $row221['상품'] . '</td>';
+                    echo $row221['상품'] . '</td>';
                     echo '<td style="border-top: 2px solid #ddd;">' . $row221['sdate'] . '~' . $row221['edate'] . '</td>';
                     $label_class = ($row221['결제방법'] == '카드') ? 'label-warning' : 'label-danger';
-                    echo '<td style="border-top: 2px solid #ddd;"><span class="label ' . $label_class . '">' . $row221['결제방법'] . '</span> ' . number_format($row221['금액']) . '</td>';
+                    echo '<td style="border-top: 2px solid #ddd;"><span class="label ' . $label_class . '">' . $row221['결제방법'] . '</span>' . number_format($row221['금액']) . '</td>';
                     echo '<td style="border-top: 2px solid #ddd;">' . $row221['결제일'] . '</td>';
                     $label_class = '';
                     switch ($row221['신규/재결제']) {
@@ -191,7 +191,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // 환불 여부 출력
                     if ($row221['환불여부'] == '환불') {
                         echo '</br>';
-                        echo ' <span class="label label-warning">' . $row221['환불여부'] . ' ' . $row221['환불일'] . ' (' . number_format($row221['환불금액']) . ')' . '</span>';
+                        echo ' <span class="label label-warning">' . $row221['환불여부'] . $row221['환불일'] . '(' . number_format($row221['환불금액']) . ')' . '</span>';
                     }
                     echo '<td style="border-top: 2px solid #ddd;">' . $row221['관리담당자'] . '</td>';
                     echo '</td>';
