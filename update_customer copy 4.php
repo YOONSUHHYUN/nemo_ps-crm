@@ -328,19 +328,19 @@
 
 
   <?php
-  require ("config/config.php");
-  require ("lib/db.php");
+  require("config/config.php");
+  require("lib/db.php");
   $conn = db_init($config["host"], $config["duser"], $config["dpw"], $config["dname"]);
 
   if ($conn->connect_error) {
-    die ("Connection failed: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
   }
 
 
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
-    if (isset ($_POST["button2"])) {
+    if (isset($_POST["button2"])) {
       $num = $_POST['num2'];
       $receive = $_POST['수신'];
       $introduction = $_POST['회사소개'];
@@ -609,15 +609,15 @@ WHERE A.고유키 = '$num'";
                 
                 UNION ALL
                 
-                (SELECT `중개업소고유키` as `중개업소아이디`, `중개업소명`, `요청일`, '네모SMS' as 분류
-                FROM sms_list_1
-                WHERE `중개업소고유키` = '$num')
+                (SELECT `아이디` as `중개업소아이디`, `중개업소명`, `요청일`, '네모SMS' as 분류
+                FROM sms_list
+                WHERE `중개업소명` = '$callCompanyName' and `대표자명` = '$callCEOName')
                 
                 UNION ALL
                 
-                (SELECT `중개업소고유키` as `중개업소아이디`, `중개업소명`, `요청일`, '직방' as 분류
-                FROM zig_sms_list_1
-                WHERE `중개업소고유키` = '$num')
+                (SELECT `업체고유키` as `중개업소아이디`, `중개업소명`, `요청일`, '직방' as 분류
+                FROM zig_sms
+                WHERE `업체고유키` = '$num')
             ) AS combine_call
             GROUP BY 
                 YEAR(요청일), MONTH(요청일)
