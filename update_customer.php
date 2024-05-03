@@ -35,14 +35,14 @@
       border-radius: 5px;
     }
 
-    .box1,
-    .box2 {
-      width: 48%;
-      /* Adjust the width as needed */
-      float: left;
-      margin-right: 2%;
-      /* Adjust the margin between the boxes as needed */
-    }
+    /* .box1, */
+    /* .box2 { */
+    /* width: 48%; */
+    /* Adjust the width as needed */
+    /* float: left; */
+    /* margin-right: 2%; */
+    /* Adjust the margin between the boxes as needed */
+    /* } */
 
     .memo-input {
       width: 60%;
@@ -303,6 +303,9 @@
   </style>
 
 
+  <link rel="stylesheet" href="bootstrap-5.3.3-dist/css/bootstrap.css">
+  <script type="text/javascript" src="bootstrap-5.3.3-dist/js/bootstrap.js"></script>
+
 
 
 
@@ -310,17 +313,6 @@
 </head>
 
 <body>
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-    integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 
 
 
@@ -333,14 +325,14 @@
   $conn = db_init($config["host"], $config["duser"], $config["dpw"], $config["dname"]);
 
   if ($conn->connect_error) {
-    die ("Connection failed: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
   }
 
 
   if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
-    if (isset ($_POST["button2"])) {
+    if (isset($_POST["button2"])) {
       $num = $_POST['num2'];
       $receive = $_POST['수신'];
       $introduction = $_POST['회사소개'];
@@ -426,7 +418,7 @@ WHERE A.고유키 = '$num'";
       echo "<div style='width: 100%;'>";
       echo "<table class='table'>";
       echo "<div style='width: 100%;'>";
-      echo "<table style='width: 100%;'>";
+      echo "<table class='table table-bordered' sstyle='width: 100%;'>";
       echo "<tr><th>업체명</th><th>대표자명</th><th>휴대폰번호</th><th>유선번호</th><th>연락처</th><th>시도</th><th>시군구</th><th>유/무료</th><th>상품종료일</th><th>가입일</th><th>매물슬롯</th></tr>";
       echo "<tr>";
       echo "<td>$currentCompanyName</td>";
@@ -475,41 +467,45 @@ WHERE A.고유키 = '$num'";
 
 
     <div style="width: 100%;">
-      <div class="box1">
-        <center>
-          <h2 class="box_margin01">신규영업 관리</h2>
-        </center>
-        <form method='POST' id='update-form' class="box_margin01">
+      <center>
+        <h2>신규영업 관리</h2>
+      </center> </br>
+      <div class="d-flex justify-content-center">
+        <!-- class="box1"> -->
+
+
+
+        <form class="d-flex justify-content-center" method='POST' id='update-form'>
 
 
 
 
-          <select name="수신" id="수신" class="form-control">
+          <select name="수신" id="수신" class="form-select form-select-lg mb-3">
             <option value=""> /수신/ </option>
             <option value="성공">성공</option>
             <option value="지연">지연</option>
             <option value="실패">실패</option>
             <option value="문자">문자</option>
           </select>
-          <select name="회사소개" id="회사소개" class="form-control">
+          <select name="회사소개" id="회사소개" class="form-select form-select-lg mb-3">
             <option value=""> /회사소개/ </option>
             <option value="성공">성공</option>
             <option value="지연">지연</option>
             <option value="실패">실패</option>
           </select>
-          <select name="상품소개" id="상품소개" class="form-control">
+          <select name="상품소개" id="상품소개" class="form-select form-select-lg mb-3">
             <option value=""> /상품소개/ </option>
             <option value="성공">성공</option>
             <option value="지연">지연</option>
             <option value="실패">실패</option>
           </select>
-          <select name="결제여부" id="결제여부" class="form-control">
+          <select name="결제여부" id="결제여부" class="form-select form-select-lg mb-3">
             <option value=""> /결제여부/ </option>
             <option value="성공">성공</option>
             <option value="지연">지연</option>
             <option value="실패">실패</option>
           </select>
-          <select name="관심도" id="관심도" class="form-control">
+          <select name="관심도" id="관심도" class="form-select form-select-lg mb-3">
             <option value=""> /관심도/ </option>
             <option value="관심0">관심0(연락거절)</option>
             <option value="관심1">관심1(이용안해요)</option>
@@ -517,7 +513,7 @@ WHERE A.고유키 = '$num'";
             <option value="관심3">관심3(가격안내+문자요청)</option>
             <option value="관심4">관심4(컨설팅+문자전송)</option>
           </select>
-          <select name="현상태" id="현상태" class="form-control">
+          <select name="현상태" id="현상태" class="form-select form-select-lg mb-3">
             <option value=""> /현상태/ </option>
             <option value="관리1">관리1(이탈)</option>
             <option value="관리2">관리2(애매)</option>
@@ -526,25 +522,29 @@ WHERE A.고유키 = '$num'";
 
           </select>
       </div>
-      <div class="box2">
-        <center>
-          <h2 class="box_margin02">유료업체 관리</h2>
-        </center>
-        <div id="statusFormContainer" class="box_margin02">
-          <form method='POST' id='update-form2'>
-            <select name="voc1" id="voc1" class="form-control">
+      </br>
+      <center>
+        <h2>유료업체 관리</h2>
+      </center>
+      </br>
+      <div class="d-flex justify-content-center">
+        <!-- class="box2"> -->
+
+        <div class="d-flex justify-content-center" id="statusFormContainer" style="width: 50%;">
+          <form class="d-flex justify-content-center" method='POST' id='update-form2'>
+            <select name="voc1" id="voc1" class="form-select form-select-lg mb-3">
               <option value="">/VOC/</option>
               <option value="일반문의">일반문의</option>
               <option value="상품문의">상품문의</option>
               <option value="컴플레인">컴플레인</option>
               <option value="해피콜">해피콜</option>
             </select>
-
+            <div id="statusFormContainer" style="width: 50%;">
+              <select name="voc2" id="voc2" class="form-select form-select-lg mb-3"></select>
+            </div>
         </div>
 
-        <div id="statusFormContainer" class="box_margin02">
-          <select name="voc2" id="voc2" class="form-control"></select>
-        </div>
+
       </div>
 
       <div>
@@ -636,7 +636,7 @@ WHERE A.고유키 = '$num'";
   if ($result4->num_rows > 0) {
     echo "<div id='tab4' class='tabcontent2' style='display:none;'>"; // tab4의 클래스를 tabcontent3로 변경
     echo "<div style='width: 100%;'>";
-    echo "<table style='width: 100%;'>";
+    echo "<table class='table table-bordered' style='width: 100%;'>";
     echo "<tr><th>날짜</th><th>네모콜</th><th>네모SMS</th><th>직방유입</th><th>합</th><th>등락</th></tr>";
 
     while ($row4 = $result4->fetch_assoc()) {
@@ -685,9 +685,9 @@ WHERE A.고유키 = '$num'";
   <!-- Tab content -->
   <div id="tab1" class="tabcontent1">
     <div style="width: 100%;">
-      <table class="table">
-        <div style="width: 100%;">
-          <table class="table">
+      <table class='table table-bordered'>
+        <div class='table table-bordered' style="width: 100%;">
+          <table class='table table-bordered'>
             <thead>
               <tr>
                 <th>수신</th>
@@ -717,11 +717,11 @@ WHERE A.고유키 = '$num'";
 
   <div id="tab2" class="tabcontent1">
     <div style="width: 100%;">
-      <table class="table">
+      <table class='table table-bordered'>
         <thead>
           <tr>
             <div class="table-responsive">
-              <table class="table table-borderless">
+              <table class='table table-bordered'>
                 <thead>
                   <tr>
                     <th>그룹</th>
