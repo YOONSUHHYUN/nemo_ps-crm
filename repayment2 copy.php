@@ -92,12 +92,12 @@ require ("db_customer3.php");
         <thead>
           <tr>
             <th class="table-secondary" scope='col' style='text-align: center; vertical-align : middle;'>당월 업체수</th>
-            <td colspan='1' style='text-align: center; vertical-align : middle;'><?php $countc = "SELECT count(distinct 업체아이디) countc from plist where if('" . $_GET['name'] . "' = '',  date_format(edate,'%Y-%m') = '" . $_GET['date'] . "'  and 환불여부 <>'취소' and 환불여부 <>'환불' , `관리담당자`='" . $_GET['name'] . "' and date_format(edate,'%Y-%m') = '" . $_GET['date'] . "'  and 환불여부 <>'취소' and 환불여부 <>'환불')";
+            <td colspan='1' style='text-align: center; vertical-align : middle;'><?php $countc = "SELECT count(distinct 업체아이디) countc from plist where `관리담당자`='" . $_GET['name'] . "' and date_format(edate,'%Y-%m') = '" . $_GET['date'] . "'  and 환불여부 <>'취소' and 환불여부 <>'환불'";
             $resultcountc = mysqli_query($conn, $countc); #or die(mysqli_error($conn));
             $rowcountc = mysqli_fetch_array($resultcountc);
             echo $rowcountc['countc']; ?></td>
             <th class="table-secondary" scope='col' style='text-align: center; vertical-align : middle;'>당월 상품수</th>
-            <td colspan='1' style='text-align: center; vertical-align : middle;'><?php $countp = "SELECT count(업체아이디) countp from plist where if('" . $_GET['name'] . "' = '', date_format(edate,'%Y-%m') = '" . $_GET['date'] . "'  and 환불여부 <>'취소' and 환불여부 <>'환불' , `관리담당자`='" . $_GET['name'] . "' and date_format(edate,'%Y-%m') = '" . $_GET['date'] . "'  and 환불여부 <>'취소' and 환불여부 <>'환불')";
+            <td colspan='1' style='text-align: center; vertical-align : middle;'><?php $countp = "SELECT count(업체아이디) countp from plist where `관리담당자`='" . $_GET['name'] . "' and date_format(edate,'%Y-%m') = '" . $_GET['date'] . "'  and 환불여부 <>'취소' and 환불여부 <>'환불'";
             $resultcountp = mysqli_query($conn, $countp); #or die(mysqli_error($conn));
             $rowcountp = mysqli_fetch_array($resultcountp);
             echo $rowcountp['countp']; ?></td>

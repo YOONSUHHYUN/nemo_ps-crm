@@ -12,12 +12,10 @@ FROM plist A
 left join company_info B
 on A.num = B.num
 where
-if('" . $_GET['name'] . "' = '' and '" . $_GET['status'] . "' = '', date_format(edate,'%Y-%m') = '" . $_GET['date'] . "'  and 환불여부 <>'취소' and 환불여부 <>'환불',
-if('" . $_GET['name'] . "' = '' , 연장여부 = '" . $_GET['status'] . "' and date_format(edate,'%Y-%m') = '" . $_GET['date'] . "' and 환불여부 <>'취소' and 환불여부 <>'환불',
 if('" . $_GET['Keyword'] . "' = '' and '" . $_GET['status'] . "' = '', `관리담당자`='" . $_GET['name'] . "' and date_format(edate,'%Y-%m') = '" . $_GET['date'] . "'  and 환불여부 <>'취소' and 환불여부 <>'환불',
 if('" . $_GET['Keyword'] . "' = '',연장여부 = '" . $_GET['status'] . "'  and `관리담당자`='" . $_GET['name'] . "' and date_format(edate,'%Y-%m') = '" . $_GET['date'] . "'  and 환불여부 <>'취소' and 환불여부 <>'환불',
 연장여부 = '" . $_GET['status'] . "' and 대표자명 = '" . $_GET['Keyword'] . "' and `관리담당자`='" . $_GET['name'] . "' and date_format(edate,'%Y-%m') = '" . $_GET['date'] . "' and 환불여부 <>'취소' and 환불여부 <>'환불'
-))))
+))
 ORDER BY 대표자명 asc
 ";
 
@@ -43,7 +41,7 @@ $row7 = mysqli_fetch_assoc($result7);
 $remain = "SELECT count(distinct(업체아이디)) as remain from plist A
 left join company_info B
 on A.num = B.num
-where if('" . $_GET['name'] . "' = '',B.연장여부 = '대기' and date_format(edate,'%Y-%m') = '" . $_GET['date'] . "' and 환불여부 <> '환불' and 환불여부 <> '취소'  ,B.연장여부 = '대기' and A.관리담당자 = '" . $_GET['name'] . "' and date_format(edate,'%Y-%m') = '" . $_GET['date'] . "' and 환불여부 <> '환불' and 환불여부 <> '취소' )";
+where B.연장여부 = '대기' and A.관리담당자 = '" . $_GET['name'] . "' and date_format(edate,'%Y-%m') = '" . $_GET['date'] . "' and 환불여부 <> '환불' and 환불여부 <> '취소' ";
 $resultremain = mysqli_query($conn, $remain) or die(mysqli_error($conn));
 $rowremain = mysqli_fetch_assoc($resultremain);
 
